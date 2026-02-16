@@ -29,6 +29,7 @@ body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica N
 .panel-header {
   padding: 24px 20px 16px; border-bottom: 1px solid #eee;
 }
+.mobile-toggle { display: none; }
 .panel-header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1d1d1f; margin-bottom: 2px; }
 .panel-header .sub { font-size: 10px; font-weight: 400; color: #444; letter-spacing: 0.2px; }
 
@@ -463,36 +464,53 @@ select:focus { border-color: #1d1d1f; }
    MOBILE & TABLET RESPONSIVE
    ========================================== */
 @media (max-width: 768px) {
-  /* Hide panel toggle on mobile */
-  #panelToggle { display: none; }
+  /* Hide sound dot and desktop panel toggle on mobile */
+  #panelToggle, .sound-dot { display: none; }
 
-  /* Canvas in top half */
+  /* Canvas is square */
   canvas {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 100vw !important;
-    height: 50vh !important;
+    height: 100vw !important;
   }
 
-  /* Panel in bottom half - always visible */
+  /* Panel below canvas */
   #panel, #panel.hidden {
-    position: fixed !important; top: 50vh !important; bottom: 0 !important;
+    position: fixed !important; top: 100vw !important; bottom: 0 !important;
     right: 0 !important; left: 0 !important;
-    width: 100% !important; height: 50vh !important;
+    width: 100% !important; height: calc(100vh - 100vw) !important;
     border-left: none; border-top: 1px solid #ddd;
     border-radius: 0;
     transform: none !important;
     background: #fafafa !important;
     overflow-y: auto;
   }
-  #panel.expanded { transform: none !important; }
+
+  /* When panel is collapsed on mobile, show only header */
+  #panel.mobile-collapsed {
+    height: 44px !important;
+    overflow: hidden !important;
+  }
 
   .panel-header {
-    padding: 12px 16px;
+    padding: 10px 16px;
     display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
   }
   .panel-header::after { display: none; }
+
+  /* Mobile panel toggle button */
+  .mobile-toggle {
+    display: flex !important;
+    width: 32px; height: 32px; border: none; background: #eee;
+    border-radius: 50%; cursor: pointer; align-items: center; justify-content: center;
+  }
+  .mobile-toggle svg {
+    width: 16px; height: 16px; stroke: #555; stroke-width: 2; fill: none;
+    transition: transform 0.2s;
+  }
 
   .section { padding: 12px 16px; }
   .actions { padding: 12px 16px; gap: 8px; flex-wrap: wrap; justify-content: center; }
@@ -556,8 +574,13 @@ select:focus { border-color: #1d1d1f; }
 
 <div id="panel">
   <div class="panel-header">
-    <h1>Golden Grid</h1>
-    <div class="sub">Your colors in perfect ratio · <button class="about-btn" id="aboutBtn">About</button></div>
+    <div>
+      <h1>Golden Grid</h1>
+      <div class="sub">Your colors in perfect ratio · <button class="about-btn" id="aboutBtn">About</button></div>
+    </div>
+    <button class="mobile-toggle" id="mobileToggle" title="Toggle panel">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
   </div>
 
   <div class="section" id="palSection"></div>
@@ -2173,19 +2196,17 @@ new p5(function(p) {
     }
   });
 
-  // Swipe down to collapse on mobile
-  let touchStartY = 0;
-  document.getElementById('panel').addEventListener('touchstart', (e) => {
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-  document.getElementById('panel').addEventListener('touchend', (e) => {
-    const touchEndY = e.changedTouches[0].clientY;
+  // Mobile panel toggle button
+  document.getElementById('mobileToggle').addEventListener('click', (e) => {
+    e.stopPropagation();
     const panel = document.getElementById('panel');
-    if (window.innerWidth <= 768 && touchEndY - touchStartY > 50 && panel.classList.contains('expanded')) {
-      panel.classList.remove('expanded');
-      playClick();
-    }
-  }, { passive: true });
+    const btn = document.getElementById('mobileToggle');
+    panel.classList.toggle('mobile-collapsed');
+    // Rotate arrow icon
+    const svg = btn.querySelector('svg');
+    svg.style.transform = panel.classList.contains('mobile-collapsed') ? 'rotate(180deg)' : '';
+    playClick();
+  });
 
   // Interval slider
   document.getElementById('interval').addEventListener('input', function() {
