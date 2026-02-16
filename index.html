@@ -524,16 +524,8 @@ select:focus { border-color: #1d1d1f; }
     display: flex;
   }
 
-  /* Show hints on mobile (simplified) */
-  #hints {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
-    padding: 8px 12px 16px;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-    gap: 4px 8px;
-  }
-  #hints .hint { font-size: 7px; }
-  #hints kbd { padding: 1px 3px; font-size: 6px; }
+  /* Hide keyboard hints on mobile - they don't work on touch */
+  #hints { display: none !important; }
 
   .panel-header {
     padding: 10px 16px;
