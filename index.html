@@ -462,6 +462,78 @@ select:focus { border-color: #1d1d1f; }
 }
 .about-btn:hover { color: #1d1d1f; }
 
+/* Welcome Modal (first visit) */
+#welcomeModal {
+  position: fixed; inset: 0; z-index: 400;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+}
+#welcomeModal.show { display: flex; }
+.welcome-card {
+  background: #fff; border-radius: 20px; padding: 32px;
+  max-width: 420px; width: 90%; box-shadow: 0 12px 48px rgba(0,0,0,0.12);
+  border: 1px solid #eee; max-height: 85vh; overflow-y: auto;
+}
+.welcome-card h2 {
+  font-size: 22px; font-weight: 600; color: #1d1d1f;
+  margin-bottom: 4px; letter-spacing: -0.5px;
+}
+.welcome-card .welcome-sub {
+  font-size: 11px; color: #666; margin-bottom: 24px; letter-spacing: 0.2px;
+}
+.welcome-card h3 {
+  font-size: 10px; font-weight: 600; color: #1d1d1f;
+  margin: 20px 0 12px; letter-spacing: 1px; text-transform: uppercase;
+}
+.welcome-steps {
+  display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px;
+}
+.welcome-step {
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: #fff;
+}
+.step-num.s1 { background: #E8356D; }
+.step-num.s2 { background: #F47A20; }
+.step-num.s3 { background: #6B3FA0; }
+.step-text {
+  font-size: 12px; color: #444; line-height: 1.5; padding-top: 2px;
+}
+.step-text strong { color: #1d1d1f; font-weight: 500; }
+.controls-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.control-item {
+  background: #fafafa; border: 1px solid #eee; border-radius: 8px;
+  padding: 10px 12px;
+}
+.control-item .ctrl-name {
+  font-size: 10px; font-weight: 600; color: #1d1d1f; margin-bottom: 3px;
+}
+.control-item .ctrl-desc {
+  font-size: 9px; color: #666; line-height: 1.4;
+}
+.welcome-check {
+  display: flex; align-items: center; gap: 8px; margin-top: 20px;
+}
+.welcome-check input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: #1d1d1f; cursor: pointer;
+}
+.welcome-check label {
+  font-size: 10px; color: #666; cursor: pointer;
+}
+.welcome-start {
+  display: block; width: 100%; margin-top: 16px; padding: 14px;
+  background: #1d1d1f; color: #fff; border: none; border-radius: 10px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.3px;
+  cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif;
+}
+.welcome-start:hover { background: #333; transform: scale(1.01); }
+.welcome-start:active { transform: scale(0.98); }
+
 /* ==========================================
    MOBILE & TABLET RESPONSIVE
    ========================================== */
@@ -572,6 +644,25 @@ select:focus { border-color: #1d1d1f; }
   .export-option .exp-icon { width: 32px; height: 32px; }
   .export-option .exp-text h3 { font-size: 10px; }
   .export-option .exp-text p { font-size: 8px; }
+
+  /* Welcome modal mobile */
+  #welcomeModal { padding: 10px; }
+  .welcome-card {
+    max-height: 85vh; padding: 20px 16px;
+    border-radius: 12px; overflow-y: auto;
+  }
+  .welcome-card h2 { font-size: 18px; }
+  .welcome-card .welcome-sub { font-size: 10px; margin-bottom: 16px; }
+  .welcome-card h3 { font-size: 9px; margin: 14px 0 10px; }
+  .welcome-steps { gap: 10px; }
+  .step-num { width: 20px; height: 20px; font-size: 10px; }
+  .step-text { font-size: 11px; }
+  .controls-grid { grid-template-columns: 1fr; gap: 6px; }
+  .control-item { padding: 8px 10px; }
+  .control-item .ctrl-name { font-size: 10px; }
+  .control-item .ctrl-desc { font-size: 9px; }
+  .welcome-check { margin-top: 14px; }
+  .welcome-start { padding: 12px; font-size: 11px; }
 }
 
 @media (max-width: 480px) {
@@ -897,6 +988,65 @@ select:focus { border-color: #1d1d1f; }
     </div>
 
     <div class="modal-close" id="modalClose">Cancel</div>
+  </div>
+</div>
+
+<!-- WELCOME MODAL (first visit) -->
+<div id="welcomeModal">
+  <div class="welcome-card">
+    <h2>Golden Grid</h2>
+    <div class="welcome-sub">Your colors in perfect ratio</div>
+
+    <h3>Quick Start</h3>
+    <div class="welcome-steps">
+      <div class="welcome-step">
+        <div class="step-num s1">1</div>
+        <div class="step-text"><strong>Choose a palette</strong> — pick from built-in colors or upload any image to extract its palette</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num s2">2</div>
+        <div class="step-text"><strong>Adjust the grid</strong> — change depth, shape, pattern, and spacing to explore variations</div>
+      </div>
+      <div class="welcome-step">
+        <div class="step-num s3">3</div>
+        <div class="step-text"><strong>Export your art</strong> — save as wallpaper for desktop, phone, or print</div>
+      </div>
+    </div>
+
+    <h3>Controls</h3>
+    <div class="controls-grid">
+      <div class="control-item">
+        <div class="ctrl-name">Depth</div>
+        <div class="ctrl-desc">How many subdivisions — higher = more detailed</div>
+      </div>
+      <div class="control-item">
+        <div class="ctrl-name">Direction</div>
+        <div class="ctrl-desc">First split: horizontal or vertical</div>
+      </div>
+      <div class="control-item">
+        <div class="ctrl-name">Inner Gap</div>
+        <div class="ctrl-desc">Space between cells (0 = touching)</div>
+      </div>
+      <div class="control-item">
+        <div class="ctrl-name">Border Radius</div>
+        <div class="ctrl-desc">Corner roundness (0 = sharp)</div>
+      </div>
+      <div class="control-item">
+        <div class="ctrl-name">Pattern</div>
+        <div class="ctrl-desc">Layout: Grid, Fibonacci, or Radial</div>
+      </div>
+      <div class="control-item">
+        <div class="ctrl-name">Shape</div>
+        <div class="ctrl-desc">What fills each cell (rect, circle, etc.)</div>
+      </div>
+    </div>
+
+    <div class="welcome-check">
+      <input type="checkbox" id="welcomeDontShow">
+      <label for="welcomeDontShow">Don't show this again</label>
+    </div>
+
+    <button class="welcome-start" id="welcomeStart">Get Started</button>
   </div>
 </div>
 
@@ -2291,6 +2441,28 @@ new p5(function(p) {
   // Close modal on background click
   document.getElementById('exportModal').addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('show');
+  });
+
+  // Welcome modal (first visit)
+  const WELCOME_KEY = 'golden-grid-welcome-seen';
+  if (!localStorage.getItem(WELCOME_KEY)) {
+    document.getElementById('welcomeModal').classList.add('show');
+  }
+  document.getElementById('welcomeStart').addEventListener('click', () => {
+    const dontShow = document.getElementById('welcomeDontShow').checked;
+    if (dontShow) {
+      localStorage.setItem(WELCOME_KEY, 'true');
+    }
+    document.getElementById('welcomeModal').classList.remove('show');
+  });
+  document.getElementById('welcomeModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      const dontShow = document.getElementById('welcomeDontShow').checked;
+      if (dontShow) {
+        localStorage.setItem(WELCOME_KEY, 'true');
+      }
+      this.classList.remove('show');
+    }
   });
 
   // About modal
