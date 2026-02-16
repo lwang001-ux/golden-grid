@@ -490,10 +490,38 @@ select:focus { border-color: #1d1d1f; }
     padding-bottom: env(safe-area-inset-bottom, 20px);
   }
 
-  /* When panel is collapsed on mobile, show only header */
+  /* When panel is collapsed on mobile, hide completely */
   #panel.mobile-collapsed {
-    height: 50px !important;
-    overflow: hidden !important;
+    transform: translateY(100%) !important;
+  }
+
+  /* Floating expand button when panel is collapsed */
+  .mobile-expand-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+  .mobile-expand-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: #555;
+    stroke-width: 2;
+    fill: none;
+  }
+  .mobile-expand-btn.show {
+    display: flex;
   }
 
   /* Show hints on mobile (simplified) */
@@ -583,6 +611,11 @@ select:focus { border-color: #1d1d1f; }
 <div id="panelToggle" title="Show/hide panel">
   <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
 </div>
+
+<!-- Mobile expand button (shows when panel collapsed) -->
+<button class="mobile-expand-btn" id="mobileExpandBtn">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
 
 <div id="panel">
   <div class="panel-header">
@@ -2218,11 +2251,18 @@ new p5(function(p) {
   document.getElementById('mobileToggle').addEventListener('click', (e) => {
     e.stopPropagation();
     const panel = document.getElementById('panel');
-    const btn = document.getElementById('mobileToggle');
-    panel.classList.toggle('mobile-collapsed');
-    // Rotate arrow icon
-    const svg = btn.querySelector('svg');
-    svg.style.transform = panel.classList.contains('mobile-collapsed') ? 'rotate(180deg)' : '';
+    const expandBtn = document.getElementById('mobileExpandBtn');
+    panel.classList.add('mobile-collapsed');
+    expandBtn.classList.add('show');
+    playClick();
+  });
+
+  // Mobile expand button - show panel again
+  document.getElementById('mobileExpandBtn').addEventListener('click', () => {
+    const panel = document.getElementById('panel');
+    const expandBtn = document.getElementById('mobileExpandBtn');
+    panel.classList.remove('mobile-collapsed');
+    expandBtn.classList.remove('show');
     playClick();
   });
 
