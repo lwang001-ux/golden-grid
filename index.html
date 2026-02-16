@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Ratio Grid — Lesa's Color Palettes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; }
+
+/* ==========================================
+   CLEAN PANEL — Dieter Rams / Apple Store
+   ========================================== */
+#panel {
+  position: fixed; top: 0; right: 0; width: 260px; height: 100vh;
+  background: #fafafa; border-left: 1px solid #eee;
+  padding: 0; z-index: 100; overflow-y: auto;
+  display: flex; flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#panel.hidden { transform: translateX(260px); }
+#panel::-webkit-scrollbar { width: 3px; }
+#panel::-webkit-scrollbar-track { background: transparent; }
+#panel::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+.panel-header {
+  padding: 24px 20px 16px; border-bottom: 1px solid #eee;
+}
+.panel-header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: #1d1d1f; margin-bottom: 2px; }
+.panel-header .sub { font-size: 10px; font-weight: 400; color: #999; letter-spacing: 0.2px; }
+
+.section { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; }
+.section-label {
+  font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  color: #999; margin-bottom: 10px;
+}
+
+.pal-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; margin-bottom: 2px; cursor: pointer; transition: all 0.2s;
+  opacity: 0.45; border-radius: 8px;
+}
+.pal-option:hover { opacity: 0.7; background: rgba(0,0,0,0.02); }
+.pal-option.active { opacity: 1; background: rgba(0,0,0,0.03); }
+.pal-dots { display: flex; gap: 2px; }
+.pal-dot { width: 14px; height: 14px; border-radius: 3px; transition: transform 0.15s; }
+.pal-option:hover .pal-dot { transform: scale(1.1); }
+.pal-name { font-size: 10px; font-weight: 400; color: #999; letter-spacing: 0.5px; font-family: 'SF Mono', 'Menlo', 'Monaco', monospace; }
+.pal-option.active .pal-name { color: #1d1d1f; font-weight: 500; }
+
+.dial-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; height: 26px; }
+.dial-label { font-size: 10px; font-weight: 400; color: #888; letter-spacing: 0.1px; min-width: 65px; }
+.dial-value {
+  font-size: 10px; font-weight: 500; width: 24px; text-align: right;
+  font-variant-numeric: tabular-nums; color: #1d1d1f;
+}
+
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 88px; height: 2px; background: #e0e0e0; border-radius: 1px; outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #1d1d1f; cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+input[type="range"]:active::-webkit-slider-thumb { background: #E8356D; }
+
+select {
+  background: #fff; color: #1d1d1f; border: 1px solid #e0e0e0;
+  border-radius: 6px; padding: 4px 8px; font-size: 10px;
+  font-family: 'Inter', sans-serif; outline: none; cursor: pointer; transition: all 0.15s;
+}
+select:hover { border-color: #ccc; }
+select:focus { border-color: #1d1d1f; }
+
+.toggle-wrap { display: flex; align-items: center; gap: 8px; }
+.toggle {
+  position: relative; width: 34px; height: 18px;
+  background: #ddd; border-radius: 9px; cursor: pointer; transition: background 0.2s;
+}
+.toggle.on { background: #1d1d1f; }
+.toggle-knob {
+  position: absolute; top: 2px; left: 2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #fff; transition: left 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+.toggle.on .toggle-knob { left: 18px; }
+
+/* Action buttons — clean, one row, flat color */
+.actions {
+  padding: 14px 20px; display: flex; gap: 8px; flex-wrap: nowrap;
+  border-bottom: 1px solid #f0f0f0;
+  justify-content: center;
+}
+.action-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #fff; border: 1.5px solid #eee;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s; position: relative;
+}
+.action-btn:hover { transform: scale(1.1); border-color: #ddd; }
+.action-btn:active { transform: scale(0.92); }
+.action-btn svg { width: 15px; height: 15px; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Each button — white bg, colored symbol */
+#btnRegen svg { stroke: #E8356D; }
+#btnShuffle svg { stroke: #F47A20; }
+#btnRandom svg { stroke: #8B9A4A; fill: none; }
+#btnRandom svg circle { fill: #8B9A4A; stroke: none; }
+#btnPlay svg { stroke: #1A9E96; }
+#btnPlay.playing svg { stroke: #D42B3E; }
+#btnExport svg { stroke: #6B3FA0; }
+#btnSound svg { stroke: #2E5BA8; }
+#btnSound.muted { border-color: #ddd; }
+#btnSound.muted svg { stroke: #ccc; }
+
+.action-btn .tooltip {
+  position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+  font-size: 7px; color: #bbb; letter-spacing: 0.5px; text-transform: uppercase;
+  white-space: nowrap; opacity: 0; transition: opacity 0.15s; pointer-events: none;
+}
+.action-btn:hover .tooltip { opacity: 1; }
+
+/* Auto-play progress ring */
+.progress-ring {
+  position: absolute; top: -3px; left: -3px;
+  width: 42px; height: 42px; pointer-events: none;
+}
+.progress-ring circle {
+  display: none;
+}
+
+/* Dieter Rams speaker */
+#ramsSpeaker:hover { border-color: #ccc; box-shadow: 0 0 0 4px rgba(0,0,0,0.03); }
+#ramsSpeaker.playing { border-color: #E8356D; }
+#ramsSpeaker.playing:hover { box-shadow: 0 0 0 4px rgba(232,53,109,0.08); }
+
+/* Export modal */
+#exportModal {
+  position: fixed; inset: 0; z-index: 300;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.85); backdrop-filter: blur(20px);
+}
+#exportModal.show { display: flex; }
+.modal-card {
+  background: #fff; border-radius: 16px; padding: 28px 28px;
+  max-width: 340px; width: 90%; box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  border: 1px solid #eee;
+}
+.modal-card h2 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 4px; }
+.modal-card .modal-sub { font-size: 10px; color: #999; margin-bottom: 20px; }
+.export-option {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; margin-bottom: 6px;
+  background: #fafafa; border: 1px solid #eee; border-radius: 10px;
+  cursor: pointer; transition: all 0.15s;
+}
+.export-option:hover { border-color: #1d1d1f; }
+.export-option .exp-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+#expDesktop .exp-icon { background: #6B3FA0; }
+#expPhone .exp-icon { background: #E8356D; }
+#expSquare .exp-icon { background: #F47A20; }
+#expPrint .exp-icon { background: #8B9A4A; }
+#expVideo .exp-icon { background: #1A9E96; }
+#expCurrent .exp-icon { background: #2E5BA8; }
+.export-option .exp-icon svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.export-option .exp-text h3 { font-size: 11px; font-weight: 500; color: #1d1d1f; margin-bottom: 1px; }
+.export-option .exp-text p { font-size: 9px; color: #999; }
+.modal-close {
+  display: block; width: 100%; text-align: center; margin-top: 14px;
+  font-size: 10px; color: #bbb; cursor: pointer; padding: 6px;
+  letter-spacing: 0.5px; transition: color 0.15s;
+}
+.modal-close:hover { color: #1d1d1f; }
+
+/* Recording indicator */
+#recIndicator {
+  position: fixed; top: 16px; left: 36px;
+  font-size: 9px; color: #E8356D; letter-spacing: 0.5px;
+  z-index: 100; opacity: 0; transition: opacity 0.3s;
+  display: flex; align-items: center; gap: 6px;
+}
+#recIndicator.show { opacity: 1; }
+#recIndicator .rec-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #E8356D;
+  animation: recBlink 1s ease-in-out infinite;
+}
+@keyframes recBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Sound indicator */
+.sound-dot {
+  position: fixed; top: 16px; left: 16px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ddd; z-index: 100; transition: all 0.15s;
+}
+.sound-dot.active { background: #E8356D; box-shadow: 0 0 8px rgba(232,53,109,0.4); }
+
+/* Panel toggle button — clean minimal */
+#panelToggle {
+  position: fixed; top: 50%; right: 260px; transform: translateY(-50%);
+  width: 24px; height: 48px; z-index: 150;
+  background: #fafafa; border: 1px solid #eee;
+  border-right: none; border-radius: 6px 0 0 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.3s ease;
+}
+#panelToggle:hover { background: #f0f0f0; width: 28px; }
+#panelToggle svg {
+  width: 12px; height: 12px; stroke: #999; stroke-width: 1.5;
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform 0.3s ease;
+}
+#panelToggle.collapsed { right: 0px; }
+#panelToggle.collapsed svg { transform: rotate(180deg); }
+#panelToggle { transition: right 0.4s ease, width 0.15s, background 0.15s; }
+
+#hints {
+  margin-top: auto; padding: 16px 20px 24px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+#hints .hint {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 9px; color: #bbb; letter-spacing: 0.2px;
+}
+#hints kbd {
+  display: inline-block; padding: 2px 6px;
+  background: transparent; border-radius: 4px; font-family: inherit; font-size: 8px;
+  border: 1px solid currentColor; white-space: nowrap;
+}
+#hints .hint:nth-child(1) kbd { color: #E88040; }
+#hints .hint:nth-child(2) kbd { color: #6850A0; }
+#hints .hint:nth-child(3) kbd { color: #48A078; }
+#hints .hint:nth-child(4) kbd { color: #E84858; }
+#hints .hint:nth-child(5) kbd { color: #8B9A4A; }
+#hints .hint:nth-child(6) kbd { color: #D88890; }
+#hints .hint:nth-child(7) kbd { color: #E88040; }
+#hints .hint:nth-child(8) kbd { color: #6850A0; }
+#hints .hint:nth-child(9) kbd { color: #48A078; }
+
+/* Palette Library Styles */
+.pal-section-header {
+  font-size: 8px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+  color: #bbb; margin: 12px 0 6px; padding-bottom: 4px;
+}
+.pal-section-header:first-of-type { margin-top: 0; }
+
+.pal-option { position: relative; }
+.pal-thumb {
+  width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0;
+  background-size: cover; background-position: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.pal-thumb-placeholder {
+  width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0;
+  background: #f0f0f0; display: flex; align-items: center; justify-content: center;
+}
+.pal-thumb-placeholder svg { width: 10px; height: 10px; stroke: #ccc; stroke-width: 1.5; fill: none; }
+
+.pal-name-input {
+  font-size: 10px; font-weight: 400; color: #1d1d1f; letter-spacing: 0.5px;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  background: #fff; border: 1px solid #ddd; border-radius: 4px;
+  padding: 2px 6px; width: 90px; outline: none;
+}
+.pal-name-input:focus { border-color: #1d1d1f; }
+
+.pal-delete {
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; border-radius: 50%; background: transparent;
+  border: none; cursor: pointer; opacity: 0; transition: opacity 0.15s, background 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.pal-delete svg { width: 10px; height: 10px; stroke: #999; stroke-width: 2; fill: none; }
+.pal-option:hover .pal-delete { opacity: 1; }
+.pal-delete:hover { background: rgba(232,53,109,0.1); }
+.pal-delete:hover svg { stroke: #E8356D; }
+
+/* Harmony Generator — integrated into Custom picker */
+.harmony-divider {
+  height: 1px; background: #e8e8e8; margin: 10px 0;
+}
+.harmony-row {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+}
+.harmony-color-btn {
+  width: 22px; height: 22px; border-radius: 5px; border: 1px solid #ddd;
+  cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden;
+}
+.harmony-color-btn:hover { border-color: #bbb; }
+.harmony-color-btn input {
+  position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px);
+  cursor: pointer; opacity: 0;
+}
+.harmony-select {
+  flex: 1; font-size: 9px; padding: 4px 6px; border: 1px solid #ddd;
+  border-radius: 5px; background: #fff; color: #666; outline: none;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+}
+.harmony-select:focus { border-color: #bbb; }
+.harmony-preview {
+  display: flex; gap: 2px; flex: 1;
+}
+.harmony-preview-dot {
+  width: 14px; height: 14px; border-radius: 3px;
+}
+.custom-action-btn {
+  font-size: 9px; padding: 4px 8px; border-radius: 5px;
+  border: 1px solid #ddd; background: #fff; color: #888;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+.custom-action-btn:hover { border-color: #bbb; color: #666; }
+
+/* About Modal */
+#aboutModal {
+  position: fixed; inset: 0; z-index: 300;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+}
+#aboutModal.show { display: flex; }
+.about-card {
+  background: #fff; border-radius: 20px; padding: 32px;
+  max-width: 440px; width: 90%; box-shadow: 0 12px 48px rgba(0,0,0,0.12);
+  border: 1px solid #eee; max-height: 85vh; overflow-y: auto;
+}
+.about-card h2 {
+  font-size: 18px; font-weight: 600; color: #1d1d1f;
+  margin-bottom: 6px; letter-spacing: -0.3px;
+}
+.about-card .about-sub {
+  font-size: 10px; color: #999; margin-bottom: 20px; letter-spacing: 0.5px;
+}
+.about-card h3 {
+  font-size: 11px; font-weight: 600; color: #1d1d1f;
+  margin: 20px 0 8px; letter-spacing: 0.3px; text-transform: uppercase;
+}
+.about-card p {
+  font-size: 11px; color: #555; line-height: 1.75; margin-bottom: 12px;
+}
+.about-card .origin {
+  color: #666; border-left: 3px solid #E8485A;
+  padding-left: 14px; margin: 16px 0; background: #fafafa;
+  padding: 12px 14px; border-radius: 0 8px 8px 0;
+}
+.about-card .origin .attribution {
+  display: block; margin-top: 8px; font-size: 10px; color: #999; font-weight: 500;
+}
+.about-card .phi-number {
+  display: inline-block; font-size: 28px; font-weight: 300;
+  color: #8B9A4A; margin: 8px 0; letter-spacing: -1px;
+}
+.about-card .phi-row {
+  display: flex; gap: 10px; margin: 16px 0; flex-wrap: wrap;
+}
+.about-card .phi-item {
+  flex: 1; min-width: 90px; padding: 10px 14px; border-radius: 8px;
+  text-align: center; cursor: pointer; transition: all 0.15s;
+  position: relative; background: transparent;
+}
+.about-card .phi-item.nature { border: 1.5px solid #8B9A4A; }
+.about-card .phi-item.art { border: 1.5px solid #E8485A; }
+.about-card .phi-item.arch { border: 1.5px solid #6850A0; }
+.about-card .phi-item.nature span { color: #8B9A4A; }
+.about-card .phi-item.art span { color: #E8485A; }
+.about-card .phi-item.arch span { color: #6850A0; }
+.about-card .phi-item span { display: block; font-size: 9px; font-weight: 600; letter-spacing: 0.3px; }
+.about-card .phi-item:hover { transform: scale(1.03); }
+.about-card .phi-item .phi-tooltip {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: #1d1d1f; color: #fff; font-size: 9px; padding: 8px 12px;
+  border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none;
+  transition: opacity 0.15s; z-index: 10; font-weight: 400; letter-spacing: 0.2px;
+}
+.about-card .phi-item .phi-tooltip::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #1d1d1f;
+}
+.about-card .phi-item:hover .phi-tooltip { opacity: 1; }
+.about-card .uses {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; margin: 12px 0;
+  list-style: none; padding: 0;
+}
+.about-card .uses li {
+  font-size: 10px; padding: 3px 0;
+  position: relative; padding-left: 12px;
+}
+.about-card .uses li::before {
+  content: ''; position: absolute; left: 0; top: 9px;
+  width: 4px; height: 4px; border-radius: 50%;
+}
+.about-card .uses li:nth-child(1) { color: #E84858; }
+.about-card .uses li:nth-child(1)::before { background: #E84858; }
+.about-card .uses li:nth-child(2) { color: #9a9450; }
+.about-card .uses li:nth-child(2)::before { background: #9a9450; }
+.about-card .uses li:nth-child(3) { color: #E88040; }
+.about-card .uses li:nth-child(3)::before { background: #E88040; }
+.about-card .uses li:nth-child(4) { color: #D88890; }
+.about-card .uses li:nth-child(4)::before { background: #D88890; }
+.about-card .uses li:nth-child(5) { color: #48A078; }
+.about-card .uses li:nth-child(5)::before { background: #48A078; }
+.about-card .uses li:nth-child(6) { color: #E84858; }
+.about-card .uses li:nth-child(6)::before { background: #E84858; }
+.about-card .uses li:nth-child(7) { color: #9a9450; }
+.about-card .uses li:nth-child(7)::before { background: #9a9450; }
+.about-card .uses li:nth-child(8) { color: #E88040; }
+.about-card .uses li:nth-child(8)::before { background: #E88040; }
+.about-card .uses li:nth-child(9) { color: #D88890; }
+.about-card .uses li:nth-child(9)::before { background: #D88890; }
+.about-card .uses li:nth-child(10) { color: #48A078; }
+.about-card .uses li:nth-child(10)::before { background: #48A078; }
+.about-card .uses li:nth-child(11) { color: #E84858; }
+.about-card .uses li:nth-child(11)::before { background: #E84858; }
+.about-card .uses li:nth-child(12) { color: #9a9450; }
+.about-card .uses li:nth-child(12)::before { background: #9a9450; }
+
+/* Phi examples panel */
+.phi-panel {
+  display: none; margin-top: 12px;
+  background: #fafafa; border: 1px solid #eee; border-radius: 10px;
+  padding: 12px 16px;
+}
+.phi-panel.show { display: block; }
+.phi-panel h4 {
+  font-size: 10px; font-weight: 600; margin: 0 0 8px; letter-spacing: 0.3px;
+}
+.phi-panel.nature h4 { color: #8B9A4A; }
+.phi-panel.art h4 { color: #E8485A; }
+.phi-panel.arch h4 { color: #6850A0; }
+.phi-panel ul {
+  margin: 0; padding: 0; list-style: none;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px;
+}
+.phi-panel li {
+  font-size: 10px; color: #666; padding: 3px 0;
+}
+.phi-row-wrap { position: relative; }
+.about-close {
+  display: block; width: 100%; text-align: center; margin-top: 24px;
+  font-size: 10px; color: #bbb; cursor: pointer; padding: 8px;
+  letter-spacing: 0.5px; transition: color 0.15s;
+}
+.about-close:hover { color: #1d1d1f; }
+.about-btn {
+  font-size: 9px; color: #bbb; cursor: pointer; letter-spacing: 0.3px;
+  transition: color 0.15s; background: none; border: none;
+  font-family: 'Inter', sans-serif;
+}
+.about-btn:hover { color: #888; }
+
+/* ==========================================
+   MOBILE & TABLET RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+  #panel {
+    position: fixed; top: auto; bottom: 0; right: 0; left: 0;
+    width: 100%; height: auto; max-height: 70vh;
+    border-left: none; border-top: 1px solid #eee;
+    border-radius: 16px 16px 0 0;
+    transform: translateY(calc(100% - 60px));
+    transition: transform 0.3s ease;
+  }
+  #panel.expanded { transform: translateY(0); }
+  #panel.hidden { transform: translateY(100%); }
+
+  .panel-header {
+    padding: 12px 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-header::after {
+    content: ''; width: 32px; height: 4px; background: #ddd;
+    border-radius: 2px; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  }
+
+  .section { padding: 12px 16px; }
+  .actions { padding: 12px 16px; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .action-btn { width: 40px; height: 40px; }
+
+  #hints {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 16px 20px; gap: 6px 10px;
+  }
+  #hints .hint { font-size: 8px; }
+  #hints kbd { padding: 2px 4px; font-size: 7px; }
+
+  #ramsPlayer { display: none; }
+
+  /* About modal mobile */
+  #aboutModal { padding: 10px; }
+  .about-card {
+    max-height: 85vh; padding: 20px 16px;
+    border-radius: 12px; overflow-y: auto;
+  }
+  .about-card h2 { font-size: 18px; }
+  .about-card h3 { font-size: 12px; }
+  .about-card p { font-size: 11px; }
+  .about-card .uses { grid-template-columns: 1fr; gap: 3px; }
+  .about-card .phi-number { font-size: 22px; }
+  .phi-panel { position: relative; margin-top: 12px; padding: 12px; }
+
+  /* Export modal mobile */
+  .modal-card { padding: 20px 16px; max-height: 80vh; overflow-y: auto; }
+  .export-option { padding: 10px; }
+  .export-option .exp-icon { width: 32px; height: 32px; }
+  .export-option .exp-text h3 { font-size: 10px; }
+  .export-option .exp-text p { font-size: 8px; }
+}
+
+@media (max-width: 480px) {
+  #panel { max-height: 75vh; }
+  .panel-header h1 { font-size: 13px; }
+  .dial-row { margin-bottom: 6px; }
+  .dial-label { font-size: 9px; }
+  .pal-option { padding: 5px 6px; }
+  .pal-dot { width: 12px; height: 12px; }
+  .pal-name { font-size: 9px; }
+  #hints { grid-template-columns: 1fr 1fr; }
+  .about-card .origin { font-size: 11px; padding: 10px; }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .action-btn { min-width: 44px; min-height: 44px; }
+  .pal-option { min-height: 44px; }
+  .toggle { min-width: 44px; }
+  .phi-item { min-height: 44px; padding: 12px; }
+  .export-option { min-height: 52px; }
+}
+</style>
+</head>
+<body>
+
+<div class="sound-dot" id="soundDot"></div>
+<div id="recIndicator"><div class="rec-dot"></div><span>Recording</span></div>
+
+<!-- Panel toggle — always visible -->
+<div id="panelToggle" title="Show/hide panel">
+  <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+</div>
+
+<div id="panel">
+  <div class="panel-header">
+    <h1>Golden Grid</h1>
+    <div class="sub">Your colors in perfect ratio · <button class="about-btn" id="aboutBtn">About</button></div>
+  </div>
+
+  <div class="section" id="palSection"></div>
+
+  <!-- ACTIONS — all 5 buttons in one compact row -->
+  <div class="actions">
+    <div class="action-btn" id="btnRegen" title="New composition">
+      <svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+      <span class="tooltip">New</span>
+    </div>
+    <div class="action-btn" id="btnShuffle" title="Shuffle colors">
+      <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+      <span class="tooltip">Shuffle</span>
+    </div>
+    <div class="action-btn" id="btnRandom" title="Random mix">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/></svg>
+      <span class="tooltip">Random</span>
+    </div>
+    <div class="action-btn" id="btnPlay" title="Auto-play">
+      <svg viewBox="0 0 24 24" id="playIcon"><polygon points="6 3 20 12 6 21 6 3" fill="none"/></svg>
+      <svg class="progress-ring" id="progressRing"><circle cx="22" cy="22" r="20"/></svg>
+      <span class="tooltip">Play</span>
+    </div>
+    <div class="action-btn" id="btnExport" title="Export wallpaper">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="tooltip">Save</span>
+    </div>
+    <div class="action-btn" id="btnSound" title="Toggle sound">
+      <svg viewBox="0 0 24 24" id="soundIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      <span class="tooltip">Sound</span>
+    </div>
+  </div>
+
+  <!-- AUTO-PLAY SETTINGS -->
+  <div class="section" id="autoplaySection" style="display:none">
+    <div class="section-label">Auto-play</div>
+    <div class="dial-row">
+      <span class="dial-label">Interval</span>
+      <input type="range" id="interval" min="1" max="10" value="3">
+      <span class="dial-value" id="intervalV">3s</span>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Transition</span>
+      <select id="transition">
+        <option value="instant">Instant</option>
+        <option value="fade" selected>Fade</option>
+      </select>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Cycle palette</span>
+      <div class="toggle-wrap">
+        <div class="toggle" id="cyclePalToggle"><div class="toggle-knob"></div></div>
+      </div>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Hide panel</span>
+      <div class="toggle-wrap">
+        <div class="toggle" id="hidePanelToggle"><div class="toggle-knob"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="section">
+    <div class="section-label">Layout</div>
+    <div class="dial-row">
+      <span class="dial-label">Pattern</span>
+      <select id="layout">
+        <option value="grid" selected>Grid</option>
+        <option value="fibonacci-grid">Fibonacci Grid</option>
+        <option value="radial">Radial Rings</option>
+      </select>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Shape</span>
+      <select id="shape">
+        <option value="rect" selected>Rectangles</option>
+        <option value="circle">Circles</option>
+        <option value="diamond">Diamonds</option>
+        <option value="parallelogram">Parallelograms</option>
+        <option value="hexagon">Hexagons</option>
+        <option value="mixed">Mixed</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="section">
+    <div class="section-label">Grid</div>
+    <div class="dial-row">
+      <span class="dial-label">Columns</span>
+      <select id="cols">
+        <option value="3">3 × 3</option>
+        <option value="4" selected>4 × 4</option>
+        <option value="5">5 × 5</option>
+        <option value="6">6 × 6</option>
+        <option value="8">8 × 8</option>
+        <option value="9">9 × 9</option>
+        <option value="10">10 × 10</option>
+        <option value="12">12 × 12</option>
+      </select>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Gap</span>
+      <input type="range" id="gap" min="0" max="20" value="4">
+      <span class="dial-value" id="gapV">4</span>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Margin</span>
+      <input type="range" id="outerGap" min="0" max="60" value="20">
+      <span class="dial-value" id="outerGapV">20</span>
+    </div>
+  </div>
+
+  <!-- SUBDIVISION -->
+  <div class="section">
+    <div class="section-label">Subdivision</div>
+    <div class="dial-row">
+      <span class="dial-label">Depth</span>
+      <input type="range" id="depth" min="1" max="6" value="3">
+      <span class="dial-value" id="depthV">3</span>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Direction</span>
+      <select id="splitDir">
+        <option value="alternate">Alternate</option>
+        <option value="horizontal">Horizontal</option>
+        <option value="vertical">Vertical</option>
+        <option value="random">Random</option>
+      </select>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Inner gap</span>
+      <input type="range" id="innerGap" min="0" max="8" value="2">
+      <span class="dial-value" id="innerGapV">2</span>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Rotation</span>
+      <input type="range" id="rot" min="0" max="100" value="0">
+      <span class="dial-value" id="rotV">0</span>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Scale</span>
+      <input type="range" id="scale" min="20" max="120" value="55">
+      <span class="dial-value" id="scaleV">55</span>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Overlap</span>
+      <input type="range" id="overlap" min="0" max="100" value="60">
+      <span class="dial-value" id="overlapV">60</span>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Breathing</span>
+      <input type="range" id="breathe" min="0" max="100" value="40">
+      <span class="dial-value" id="breatheV">40</span>
+    </div>
+  </div>
+
+  <!-- STYLE -->
+  <div class="section">
+    <div class="section-label">Style</div>
+    <div class="dial-row">
+      <span class="dial-label">Corners</span>
+      <input type="range" id="radius" min="0" max="20" value="2">
+      <span class="dial-value" id="radiusV">2</span>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Border</span>
+      <select id="border">
+        <option value="none">None</option>
+        <option value="thin">Thin dark</option>
+        <option value="white">Thin white</option>
+      </select>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Background</span>
+      <select id="bg">
+        <option value="dark">Dark</option>
+        <option value="white" selected>White</option>
+        <option value="warm">Warm gray</option>
+        <option value="cool">Cool gray</option>
+      </select>
+    </div>
+    <div class="dial-row">
+      <span class="dial-label">Animate</span>
+      <div class="toggle-wrap">
+        <div class="toggle" id="animateToggle"><div class="toggle-knob"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIETER RAMS SPEAKER — Song of the Week -->
+  <div id="ramsPlayer" style="padding:16px 12px 12px; text-align:center;">
+    <div id="ramsSpeaker" style="width:80px; height:80px; margin:0 auto; border-radius:50%; border:2px solid #ddd; background:#f9f9f9; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; position:relative;">
+      <!-- Concentric rings like Braun SK radio speaker -->
+      <svg viewBox="0 0 80 80" width="60" height="60" style="position:absolute;">
+        <circle cx="40" cy="40" r="36" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+        <circle cx="40" cy="40" r="28" fill="none" stroke="#e8e8e8" stroke-width="0.8"/>
+        <circle cx="40" cy="40" r="20" fill="none" stroke="#eee" stroke-width="0.6"/>
+        <circle cx="40" cy="40" r="12" fill="none" stroke="#f0f0f0" stroke-width="0.5"/>
+        <circle cx="40" cy="40" r="5" fill="#ddd"/>
+      </svg>
+      <!-- Animated rings when playing -->
+      <svg id="ramsRings" viewBox="0 0 80 80" width="60" height="60" style="position:absolute; opacity:0; transition:opacity 0.3s;">
+        <circle cx="40" cy="40" r="36" fill="none" stroke="#E8356D" stroke-width="1" opacity="0.3">
+          <animate attributeName="r" values="36;38;36" dur="1.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="1.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="40" cy="40" r="28" fill="none" stroke="#F47A20" stroke-width="0.8" opacity="0.3">
+          <animate attributeName="r" values="28;30;28" dur="0.9s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.3;0.5;0.3" dur="0.9s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="40" cy="40" r="20" fill="none" stroke="#1A9E96" stroke-width="0.6" opacity="0.3">
+          <animate attributeName="r" values="20;22;20" dur="0.7s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="40" cy="40" r="5" fill="#E8356D">
+          <animate attributeName="r" values="5;6;5" dur="0.6s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+    <div style="margin-top:8px; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:#bbb; font-family:'SF Mono',SFMono-Regular,Menlo,monospace;">Song of the Week</div>
+    <div id="ramsSongTitle" style="margin-top:3px; font-size:9px; color:#999; min-height:12px;"></div>
+    <div id="ramsSongNote" style="margin-top:6px; font-size:7px; color:#ccc; letter-spacing:0.5px; line-height:1.4;">
+      Powered by royalty-free music
+    </div>
+  </div>
+
+  <div id="hints">
+    <div class="hint"><kbd>Click</kbd><span>re-divide</span></div>
+    <div class="hint"><kbd>Space</kbd><span>regenerate</span></div>
+    <div class="hint"><kbd>P</kbd><span>auto-play</span></div>
+    <div class="hint"><kbd>O</kbd><span>stop</span></div>
+    <div class="hint"><kbd>S</kbd><span>save</span></div>
+    <div class="hint"><kbd>R</kbd><span>random mix</span></div>
+    <div class="hint"><kbd>← →</kbd><span>palette</span></div>
+    <div class="hint"><kbd>F</kbd><span>fullscreen</span></div>
+    <div class="hint"><kbd>Esc</kbd><span>exit</span></div>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div id="exportModal">
+  <div class="modal-card">
+    <h2>Export</h2>
+    <div class="modal-sub">Save your composition as wallpaper or screensaver</div>
+
+    <div class="export-option" id="expDesktop">
+      <div class="exp-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+      <div class="exp-text"><h3>Desktop Wallpaper</h3><p>PNG · 2560 × 1440 · Zoom backgrounds, presentations</p></div>
+    </div>
+
+    <div class="export-option" id="expPhone">
+      <div class="exp-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div>
+      <div class="exp-text"><h3>Phone Wallpaper</h3><p>PNG · 1170 × 2532 · lock screens, home screens</p></div>
+    </div>
+
+    <div class="export-option" id="expSquare">
+      <div class="exp-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+      <div class="exp-text"><h3>Square</h3><p>PNG · 2160 × 2160 · social media, cards, gift tags</p></div>
+    </div>
+
+    <div class="export-option" id="expPrint">
+      <div class="exp-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+      <div class="exp-text"><h3>Print Resolution</h3><p>PNG · 4800 × 4800 · canvas, wall art, wrapping paper</p></div>
+    </div>
+
+    <div class="export-option" id="expVideo">
+      <div class="exp-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+      <div class="exp-text"><h3>Screensaver Video</h3><p>WebM · 10 seconds · auto-regenerating</p></div>
+    </div>
+
+    <div class="export-option" id="expCurrent">
+      <div class="exp-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+      <div class="exp-text"><h3>Current View</h3><p>PNG · exact screen size</p></div>
+    </div>
+
+    <div class="modal-close" id="modalClose">Cancel</div>
+  </div>
+</div>
+
+<!-- ABOUT MODAL -->
+<div id="aboutModal">
+  <div class="about-card">
+    <h2>Golden Grid</h2>
+
+    <div class="origin">
+      What the gears cannot do the computer might. The computer is the Proteus of machines. Its essence is its universality, its power to simulate. Because it can take on a thousand forms and can serve a thousand functions, it can appeal to a thousand tastes.
+      <span class="attribution">— Seymour Papert</span>
+    </div>
+
+    <h3>The Golden Ratio</h3>
+    <p>
+      <span class="phi-number">1.618...</span><br>
+      This number, known as phi, has fascinated mathematicians, artists, and designers for millennia. The canvas divides at the phi ratio (61.8% to 38.2%), creating nested cells with proportions found throughout:
+    </p>
+
+    <div class="phi-row-wrap">
+      <div class="phi-row">
+        <div class="phi-item nature" data-panel="nature-panel">
+          <span>Nature</span>
+        </div>
+        <div class="phi-item art" data-panel="art-panel">
+          <span>Art</span>
+        </div>
+        <div class="phi-item arch" data-panel="arch-panel">
+          <span>Architecture</span>
+        </div>
+      </div>
+      <div class="phi-panel nature" id="nature-panel">
+        <h4>Golden Ratio in Nature</h4>
+        <ul>
+          <li>Romanesco broccoli fractals</li>
+          <li>Hurricane cloud spirals</li>
+          <li>DNA double helix proportions</li>
+          <li>Fingerprint whorl patterns</li>
+          <li>Bee honeycomb geometry</li>
+          <li>Fern frond unfurling</li>
+        </ul>
+      </div>
+      <div class="phi-panel art" id="art-panel">
+        <h4>Golden Ratio in Art</h4>
+        <ul>
+          <li>Mondrian's grid compositions</li>
+          <li>Seurat's pointillism spacing</li>
+          <li>Tool's Lateralus album structure</li>
+          <li>Twitter's old logo proportions</li>
+          <li>Saul Bass movie posters</li>
+          <li>Hiroshi Sugimoto's seascapes</li>
+        </ul>
+      </div>
+      <div class="phi-panel arch" id="arch-panel">
+        <h4>Golden Ratio in Architecture</h4>
+        <ul>
+          <li>Apple Park's circular form</li>
+          <li>Taj Mahal facade ratios</li>
+          <li>Vatican spiral staircase</li>
+          <li>Japanese temple joinery</li>
+          <li>Barcelona Pavilion by Mies</li>
+          <li>Sydney Opera House shells</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>The Lineage</h3>
+    <p>
+      This tool stands on the shoulders of pioneers. Vera Molnar, a pioneer of generative art, proved that constraint plus chance equals poetry. Josef Albers showed that the same color looks completely different depending on what surrounds it. Anni Albers demonstrated that grid-based patterns could mirror computational logic decades before computers.
+    </p>
+    <p>
+      Built with p5.js, the descendant of Processing, co-created by Casey Reas, who said: "Generative art mistakenly leads some to believe a computer has usurped the creative act, but nothing could be further from the truth."
+    </p>
+
+    <h3>Color as System</h3>
+    <p>
+      Color in generative art is not random. Artists treat color as a system with rules, probabilities, and relationships. Your palette choices define the boundaries. The algorithm explores within them.
+    </p>
+
+    <h3>Your Colors, Everywhere</h3>
+    <p>
+      Extract colors from any image and put them to work:
+    </p>
+    <ul class="uses">
+      <li>Desktop wallpaper</li>
+      <li>Phone backgrounds</li>
+      <li>Zoom backgrounds</li>
+      <li>Social media posts</li>
+      <li>Canvas prints</li>
+      <li>Wall art</li>
+      <li>Presentations</li>
+      <li>Gift tags</li>
+    </ul>
+
+    <h3>Why Golden Grid?</h3>
+    <p>
+      p5.js is powerful, but it requires code. Golden Grid removes that barrier. Upload an image, extract the colors that inspire you, and create art in seconds.
+    </p>
+    <p>
+      Most generative art tools treat color as an afterthought. Golden Grid flips this: color is the input, composition is the output. The phi-based subdivision engine handles the math. You focus on what moves you.
+    </p>
+    <p>
+      Every composition is unique. Every color story is yours.
+    </p>
+
+    <div class="about-close" id="aboutClose">Close</div>
+  </div>
+</div>
+
+<script>
+// =============================================
+// PALETTES
+// =============================================
+const PALETTES = [
+  { name: "p5cc01", colors: ['#8B9A4A','#9EAA52','#7A8A3C','#E84858','#484848'] },
+  { name: "p5cc02", colors: ['#D4A0A0','#C08888','#3C4840','#2C3830','#E88880'] },
+  { name: "p5cc03", colors: ['#6B4828','#D8D848','#5C3848','#3C4830','#D88890'] },
+  { name: "p5cc04", colors: ['#1F2E3D','#6850A0','#A8A8B0','#B8B8A8','#C8C078'] },
+  { name: "p5cc05", colors: ['#E8C840','#E88040','#8850A0','#E8E0F0','#F0E8F0'] },
+  { name: "p5cc06", colors: ['#1F2E3D','#6850A0','#A8A8B0','#B8B8A8','#C8C078'] },
+  { name: "p5cc07", colors: ['#B8A8D0','#E8E0F0','#E8D850','#E85850','#D8A0C8'] }
+];
+
+// Keep original built-in palettes for reference
+const BUILTIN_PALETTES = [...PALETTES];
+const STORAGE_KEY = 'lesa-golden-grid-palettes';
+
+function loadUserPalettes() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const userPals = JSON.parse(saved);
+      PALETTES.push(...userPals);
+    }
+  } catch(e) { console.warn('Failed to load palettes', e); }
+}
+
+function saveUserPalettes() {
+  try {
+    const userPals = PALETTES.filter(p => p.userCreated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(userPals));
+  } catch(e) { console.warn('Failed to save palettes', e); }
+}
+
+// =============================================
+// COLOR HARMONY UTILITIES
+// =============================================
+function hexToHsl(hex) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
+function hslToHex(h, s, l) {
+  h = ((h % 360) + 360) % 360;
+  s = Math.max(0, Math.min(100, s)) / 100;
+  l = Math.max(0, Math.min(100, l)) / 100;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  let r, g, b;
+  if (h < 60) { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  const toHex = v => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return '#' + toHex(r) + toHex(g) + toHex(b);
+}
+
+function generateHarmony(baseColor, type) {
+  const hsl = hexToHsl(baseColor);
+  const h = hsl.h, s = hsl.s, l = hsl.l;
+  switch (type) {
+    case 'complementary':
+      return [
+        baseColor,
+        hslToHex((h + 180) % 360, s, l),
+        hslToHex(h, s, Math.min(l + 15, 85)),
+        hslToHex((h + 180) % 360, s, Math.max(l - 15, 15)),
+        hslToHex(h, Math.max(s - 20, 20), l)
+      ];
+    case 'analogous':
+      return [
+        hslToHex((h - 30 + 360) % 360, s, l),
+        hslToHex((h - 15 + 360) % 360, s, l),
+        baseColor,
+        hslToHex((h + 15) % 360, s, l),
+        hslToHex((h + 30) % 360, s, l)
+      ];
+    case 'triadic':
+      return [
+        baseColor,
+        hslToHex((h + 120) % 360, s, l),
+        hslToHex((h + 240) % 360, s, l),
+        hslToHex(h, s, Math.min(l + 20, 85)),
+        hslToHex((h + 120) % 360, s, Math.max(l - 20, 15))
+      ];
+    case 'split-complementary':
+      return [
+        baseColor,
+        hslToHex((h + 150) % 360, s, l),
+        hslToHex((h + 210) % 360, s, l),
+        hslToHex(h, s, Math.min(l + 15, 85)),
+        hslToHex((h + 180) % 360, Math.max(s - 15, 20), l)
+      ];
+    default:
+      return [baseColor];
+  }
+}
+
+const PHI = (1 + Math.sqrt(5)) / 2;
+const PHI_RATIO = 1 / PHI;
+
+let currentPal = 0;
+let grid = [];
+let colorIndex = 0;
+let animateOn = false;
+let soundOn = true;
+
+// Auto-play state
+let autoPlaying = false;
+let autoPlayTimer = null;
+let autoPlayStart = 0;
+let cyclePalette = false;
+let hidePanel = false;
+
+// Fade transition
+let fadeAlpha = 255;
+let fading = false;
+
+// Recording state
+let recording = false;
+let mediaRecorder = null;
+let recordedChunks = [];
+
+// =============================================
+// SOUND ENGINE
+// =============================================
+let audioCtx = null;
+let compressor = null;
+
+function ensureAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  compressor = audioCtx.createDynamicsCompressor();
+  compressor.connect(audioCtx.destination);
+}
+
+// Gentle click — dropdown/general interaction
+function playClick() {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.setValueAtTime(880, t);
+  osc.frequency.exponentialRampToValueAtTime(440, t + 0.04);
+  gain.gain.setValueAtTime(0.12, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+  osc.connect(gain); gain.connect(compressor); osc.start(t); osc.stop(t + 0.08);
+  flashSoundDot();
+}
+
+// Micro-tick — slider scrubbing
+function playTick() {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.value = 1200 + Math.random() * 200;
+  gain.gain.setValueAtTime(0.05, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+  osc.connect(gain); gain.connect(compressor); osc.start(t); osc.stop(t + 0.035);
+  flashSoundDot();
+}
+
+// Warm chord — palette selection (different root per palette)
+function playPaletteChord(index) {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  const baseNotes = [261.6, 293.7, 329.6, 392.0, 440.0];
+  const base = baseNotes[index % baseNotes.length];
+  [1, 1.25, 1.5].forEach((ratio, i) => {
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = 'triangle'; osc.frequency.value = base * ratio;
+    gain.gain.setValueAtTime(0, t + i * 0.04);
+    gain.gain.linearRampToValueAtTime(0.07, t + i * 0.04 + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    osc.connect(gain); gain.connect(compressor); osc.start(t + i * 0.04); osc.stop(t + 0.6);
+  });
+  flashSoundDot();
+}
+
+// NEW — bright ascending sparkle (creation/birth feeling)
+function playRegenerate() {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  // C major pentatonic rising fast — feels like something new appearing
+  const notes = [523.3, 659.3, 784.0, 1047, 1319];
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, t + i * 0.04);
+    gain.gain.linearRampToValueAtTime(0.06, t + i * 0.04 + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.04 + 0.2);
+    osc.connect(gain); gain.connect(compressor);
+    osc.start(t + i * 0.04); osc.stop(t + i * 0.04 + 0.25);
+  });
+  // Add a soft white noise burst for "whoosh"
+  const bufLen = audioCtx.sampleRate * 0.15;
+  const buf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * 0.03;
+  const noise = audioCtx.createBufferSource(); noise.buffer = buf;
+  const ng = audioCtx.createGain();
+  ng.gain.setValueAtTime(0.08, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+  noise.connect(ng); ng.connect(compressor); noise.start(t); noise.stop(t + 0.15);
+  flashSoundDot();
+}
+
+// SHUFFLE — playful random scatter (like dice tumbling)
+function playShuffle() {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  const scale = [261.6, 329.6, 392, 440, 523.3, 659.3, 784];
+  for (let i = 0; i < 8; i++) {
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+    osc.frequency.value = scale[Math.floor(Math.random() * scale.length)];
+    const onset = t + i * 0.03;
+    gain.gain.setValueAtTime(0.04, onset);
+    gain.gain.exponentialRampToValueAtTime(0.001, onset + 0.05);
+    osc.connect(gain); gain.connect(compressor);
+    osc.start(onset); osc.stop(onset + 0.07);
+  }
+  flashSoundDot();
+}
+
+// PLAY START — warm rising fifth (anticipation)
+function playStart() {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  [[392, 'triangle'], [587.3, 'sine']].forEach(([freq, type], i) => {
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, t + i * 0.08);
+    gain.gain.linearRampToValueAtTime(0.09, t + i * 0.08 + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.4);
+    osc.connect(gain); gain.connect(compressor);
+    osc.start(t + i * 0.08); osc.stop(t + i * 0.08 + 0.45);
+  });
+  flashSoundDot();
+}
+
+// PLAY STOP — soft descending minor (gentle stop)
+function playStop() {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  [[587.3, 'sine'], [349.2, 'triangle']].forEach(([freq, type], i) => {
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, t + i * 0.08);
+    gain.gain.linearRampToValueAtTime(0.07, t + i * 0.08 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.3);
+    osc.connect(gain); gain.connect(compressor);
+    osc.start(t + i * 0.08); osc.stop(t + i * 0.08 + 0.35);
+  });
+  flashSoundDot();
+}
+
+// EXPORT — satisfying camera shutter + confirmation ding
+function playExport() {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  // Shutter noise
+  const bufLen = audioCtx.sampleRate * 0.06;
+  const buf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * 0.15 * (1 - i / bufLen);
+  const noise = audioCtx.createBufferSource(); noise.buffer = buf;
+  const ng = audioCtx.createGain();
+  ng.gain.setValueAtTime(0.12, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+  noise.connect(ng); ng.connect(compressor); noise.start(t); noise.stop(t + 0.06);
+  // Confirmation tone
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.value = 1047;
+  gain.gain.setValueAtTime(0, t + 0.07);
+  gain.gain.linearRampToValueAtTime(0.08, t + 0.09);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+  osc.connect(gain); gain.connect(compressor); osc.start(t + 0.07); osc.stop(t + 0.4);
+  flashSoundDot();
+}
+
+// SOUND TOGGLE ON — bright ping
+function playSoundOn() {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.value = 1047;
+  gain.gain.setValueAtTime(0.1, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+  osc.connect(gain); gain.connect(compressor); osc.start(t); osc.stop(t + 0.2);
+  flashSoundDot();
+}
+
+// SOUND TOGGLE OFF — low soft thud
+function playSoundOff() {
+  ensureAudio(); // play even when toggling off
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.setValueAtTime(220, t);
+  osc.frequency.exponentialRampToValueAtTime(110, t + 0.08);
+  gain.gain.setValueAtTime(0.1, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+  osc.connect(gain); gain.connect(compressor); osc.start(t); osc.stop(t + 0.12);
+}
+
+function playCellTone(x, y, w, h) {
+  if (!soundOn) return; ensureAudio();
+  const t = audioCtx.currentTime;
+  const area = w * h; const maxArea = 200 * 200;
+  const freq = 220 + (1 - Math.min(area / maxArea, 1)) * 440;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(freq, t); osc.frequency.exponentialRampToValueAtTime(freq * 0.7, t + 0.4);
+  gain.gain.setValueAtTime(0.12, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+  osc.connect(gain); gain.connect(compressor); osc.start(t); osc.stop(t + 0.45);
+  flashSoundDot();
+}
+
+// playSave kept as alias for backward compat
+function playSave() { playExport(); }
+
+function flashSoundDot() {
+  const dot = document.getElementById('soundDot');
+  dot.classList.add('active');
+  clearTimeout(window._dotTimeout);
+  window._dotTimeout = setTimeout(() => dot.classList.remove('active'), 150);
+}
+
+// =============================================
+// FIBONACCI HELPERS
+// =============================================
+const GOLDEN_ANGLE = 2.39996322972865332;
+function fibNumbers(n) {
+  let f = [1, 1];
+  for (let i = 2; i < n; i++) f.push(f[i - 1] + f[i - 2]);
+  return f;
+}
+
+// =============================================
+// SHAPE DRAWING — cubes, diamonds, etc.
+// =============================================
+function drawShape(p, type, x, y, w, h, col, angle, borderStyle, cornerRadius) {
+  let c = p.color(col);
+  let r = p.red(c), g = p.green(c), b = p.blue(c);
+
+  if (borderStyle === 'thin') { p.stroke(30); p.strokeWeight(0.8); }
+  else if (borderStyle === 'white') { p.stroke(255, 40); p.strokeWeight(0.5); }
+  else p.noStroke();
+
+  if (type === 'rect') {
+    p.fill(col);
+    p.rect(x, y, w, h, cornerRadius);
+    return;
+  }
+
+  if (type === 'circle') {
+    p.fill(col);
+    let diameter = Math.min(w, h);
+    p.ellipse(x + w/2, y + h/2, diameter, diameter);
+    return;
+  }
+
+  let s = Math.min(w, h) * 0.5;
+  let cx = x + w / 2, cy = y + h / 2;
+
+  p.push();
+  p.translate(cx, cy);
+  p.rotate(angle);
+
+  switch (type) {
+    case 'diamond':
+      p.fill(r, g, b);
+      p.beginShape();
+      p.vertex(0, -s); p.vertex(s * 0.65, 0); p.vertex(0, s); p.vertex(-s * 0.65, 0);
+      p.endShape(p.CLOSE);
+      break;
+
+    case 'cube':
+      // Top face
+      p.fill(r + 30, g + 30, b + 30);
+      p.beginShape();
+      p.vertex(0, -s * 0.55); p.vertex(s * 0.6, -s * 0.2);
+      p.vertex(0, s * 0.1); p.vertex(-s * 0.6, -s * 0.2);
+      p.endShape(p.CLOSE);
+      // Left face
+      p.fill(r - 15, g - 15, b - 10);
+      p.beginShape();
+      p.vertex(-s * 0.6, -s * 0.2); p.vertex(0, s * 0.1);
+      p.vertex(0, s * 0.55); p.vertex(-s * 0.6, s * 0.25);
+      p.endShape(p.CLOSE);
+      // Right face
+      p.fill(r - 40, g - 35, b - 25);
+      p.beginShape();
+      p.vertex(s * 0.6, -s * 0.2); p.vertex(s * 0.6, s * 0.25);
+      p.vertex(0, s * 0.55); p.vertex(0, s * 0.1);
+      p.endShape(p.CLOSE);
+      break;
+
+    case 'parallelogram':
+      p.fill(r, g, b);
+      let sk = s * 0.3;
+      p.beginShape();
+      p.vertex(-s * 0.55 + sk, -s * 0.35); p.vertex(s * 0.55 + sk, -s * 0.35);
+      p.vertex(s * 0.55 - sk, s * 0.35); p.vertex(-s * 0.55 - sk, s * 0.35);
+      p.endShape(p.CLOSE);
+      break;
+
+    case 'hexagon':
+      p.fill(r, g, b);
+      p.beginShape();
+      for (let i = 0; i < 6; i++) {
+        let a = (Math.PI / 3) * i - Math.PI / 6;
+        p.vertex(Math.cos(a) * s * 0.6, Math.sin(a) * s * 0.6);
+      }
+      p.endShape(p.CLOSE);
+      break;
+  }
+  p.pop();
+}
+
+// =============================================
+// SUBDIVISION (golden ratio recursive split)
+// =============================================
+function subdivide(x, y, w, h, depth, maxDepth, direction, colors) {
+  if (depth >= maxDepth || w < 4 || h < 4) {
+    const color = colors[colorIndex % colors.length];
+    colorIndex++;
+    return { x, y, w, h, color, children: null };
+  }
+  const innerGap = parseInt(document.getElementById('innerGap').value);
+  const halfGap = innerGap / 2;
+  let splitH;
+  const splitDir = document.getElementById('splitDir').value;
+  if (splitDir === 'alternate') splitH = depth % 2 === 0;
+  else if (splitDir === 'horizontal') splitH = true;
+  else if (splitDir === 'vertical') splitH = false;
+  else splitH = Math.random() > 0.5;
+
+  const flip = (depth + direction) % 2 === 0;
+  const ratio = flip ? PHI_RATIO : (1 - PHI_RATIO);
+  let childA, childB;
+
+  if (splitH) {
+    const sy = y + h * ratio;
+    childA = subdivide(x, y, w, Math.max(sy - y - halfGap, 2), depth + 1, maxDepth, direction, colors);
+    childB = subdivide(x, sy + halfGap, w, Math.max((y + h) - sy - halfGap, 2), depth + 1, maxDepth, direction + 1, colors);
+  } else {
+    const sx = x + w * ratio;
+    childA = subdivide(x, y, Math.max(sx - x - halfGap, 2), h, depth + 1, maxDepth, direction, colors);
+    childB = subdivide(sx + halfGap, y, Math.max((x + w) - sx - halfGap, 2), h, depth + 1, maxDepth, direction + 1, colors);
+  }
+  return { x, y, w, h, color: null, children: [childA, childB] };
+}
+
+// =============================================
+// GENERATE — supports grid + all Fibonacci layouts
+// =============================================
+// Items for non-grid layouts
+let freeItems = [];
+
+function generateGrid(p, targetW, targetH, panelW) {
+  grid = []; freeItems = []; colorIndex = 0;
+
+  const cols = parseInt(document.getElementById('cols').value);
+  const rows = cols;
+  const gap = parseInt(document.getElementById('gap').value);
+  const outerGap = parseInt(document.getElementById('outerGap').value);
+  const maxDepth = parseInt(document.getElementById('depth').value);
+  const layout = document.getElementById('layout').value;
+  const rotAmt = parseInt(document.getElementById('rot').value) / 100;
+  const scaleVal = parseInt(document.getElementById('scale').value);
+  const overlapVal = parseInt(document.getElementById('overlap').value) / 100;
+  const pw = panelW !== undefined ? panelW : (document.getElementById('panel').classList.contains('hidden') ? 0 : 260);
+  const tw = targetW || p.width;
+  const th = targetH || p.height;
+
+  const pal = PALETTES[currentPal];
+  const shuffled = [...pal.colors].sort(() => Math.random() - 0.5);
+
+  if (layout === 'grid') {
+    // Original golden-ratio grid
+    const availW = tw - pw - outerGap * 2;
+    const availH = th - outerGap * 2;
+    const cellSize = Math.min((availW - gap * (cols - 1)) / cols, (availH - gap * (rows - 1)) / rows);
+    const totalW = cols * cellSize + (cols - 1) * gap;
+    const totalH = rows * cellSize + (rows - 1) * gap;
+    const startX = (tw - pw - totalW) / 2;
+    const startY = (th - totalH) / 2;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const x = startX + col * (cellSize + gap);
+        const y = startY + row * (cellSize + gap);
+        grid.push(subdivide(x, y, cellSize, cellSize, 0, maxDepth, (row * cols + col) % 2, shuffled));
+      }
+    }
+  } else {
+    // Fibonacci / freeform layouts — items placed individually
+    const count = cols * rows;
+    const cx = (tw - pw) / 2;
+    const cy = th / 2;
+    const fibs = fibNumbers(14);
+
+    for (let i = 0; i < count; i++) {
+      let ix, iy, size;
+      let fi = i % fibs.length;
+      let fiScale = fibs[Math.min(fi, 9)] / fibs[9];
+
+      switch (layout) {
+        case 'fibonacci-grid': {
+          let c = cols;
+          let sp = scaleVal * (2 - overlapVal);
+          let col = i % c;
+          let row = Math.floor(i / c);
+          let ox = (tw - pw - c * sp) / 2;
+          let oy = (th - Math.ceil(count / c) * sp) / 2;
+          ix = ox + col * sp + sp / 2;
+          iy = oy + row * sp + sp / 2;
+          size = scaleVal * (0.35 + (fibs[col % 8] / fibs[7]) * 0.65);
+          break;
+        }
+        case 'radial': {
+          let ring = Math.floor(i / 12);
+          let seg = i % 12;
+          let a = (seg / 12) * Math.PI * 2 + ring * 0.35;
+          let r = (ring + 1) * scaleVal * 1.1;
+          ix = cx + Math.cos(a) * r;
+          iy = cy + Math.sin(a) * r;
+          size = scaleVal * (0.5 + (ring % 3) * 0.2);
+          break;
+        }
+      }
+
+      let rot = (Math.random() - 0.5) * rotAmt * Math.PI * 0.6;
+      let shapeType = document.getElementById('shape').value;
+      if (shapeType === 'mixed') {
+        shapeType = ['rect', 'circle', 'diamond', 'parallelogram', 'hexagon'][i % 5];
+      }
+
+      freeItems.push({
+        x: ix - size / 2, y: iy - size / 2,
+        w: size, h: size,
+        color: shuffled[i % shuffled.length],
+        rot, shapeType,
+        phase: Math.random() * Math.PI * 2,
+        breathSpeed: 0.008 + Math.random() * 0.015
+      });
+    }
+  }
+}
+
+// =============================================
+// DRAW — handles both grid cells and free items
+// =============================================
+function drawCell(p, cell, t) {
+  const radius = parseInt(document.getElementById('radius').value);
+  const borderStyle = document.getElementById('border').value;
+  const shapeType = document.getElementById('shape').value;
+  const breathAmt = parseInt(document.getElementById('breathe').value) / 100;
+
+  if (cell.children) {
+    for (let child of cell.children) drawCell(p, child, t);
+  } else {
+    let cx = cell.x, cy = cell.y, cw = cell.w, ch = cell.h;
+    if (animateOn || breathAmt > 0) {
+      const phase = (cell.x * 0.01 + cell.y * 0.013);
+      const breath = Math.sin(t * 0.8 + phase) * 2 * breathAmt;
+      cx -= breath * 0.5; cy -= breath * 0.5; cw += breath; ch += breath;
+    }
+    let type = shapeType === 'mixed'
+      ? ['rect', 'circle', 'diamond', 'parallelogram', 'hexagon'][Math.floor((cell.x * 7 + cell.y * 13) % 5)]
+      : shapeType;
+    drawShape(p, type, cx, cy, cw, ch, cell.color, 0, borderStyle, radius);
+  }
+}
+
+function drawFreeItem(p, item, t) {
+  const borderStyle = document.getElementById('border').value;
+  const radius = parseInt(document.getElementById('radius').value);
+  const breathAmt = parseInt(document.getElementById('breathe').value) / 100;
+
+  let bx = item.x, by = item.y, bw = item.w, bh = item.h;
+  if (breathAmt > 0) {
+    const breath = Math.sin(t * item.breathSpeed * 60 + item.phase) * 3 * breathAmt;
+    bx -= breath * 0.5; by -= breath * 0.5; bw += breath; bh += breath;
+  }
+  drawShape(p, item.shapeType, bx, by, bw, bh, item.color, item.rot, borderStyle, radius);
+}
+
+function findClickedSquare(mx, my) {
+  for (let i = 0; i < grid.length; i++) {
+    const c = grid[i];
+    if (mx >= c.x && mx <= c.x + c.w && my >= c.y && my <= c.y + c.h) return i;
+  }
+  return -1;
+}
+
+function reSubdivide(idx) {
+  const cell = grid[idx];
+  const maxDepth = parseInt(document.getElementById('depth').value);
+  const pal = PALETTES[currentPal];
+  const shuffled = [...pal.colors].sort(() => Math.random() - 0.5);
+  colorIndex = Math.floor(Math.random() * pal.colors.length);
+  grid[idx] = subdivide(cell.x, cell.y, cell.w, cell.h, 0, maxDepth, Math.floor(Math.random() * 2), shuffled);
+}
+
+function shuffleColors() {
+  const pal = PALETTES[currentPal];
+  const shuffled = [...pal.colors].sort(() => Math.random() - 0.5);
+  let idx = 0;
+  function recolor(node) {
+    if (node.children) { for (let c of node.children) recolor(c); }
+    else { node.color = shuffled[idx % shuffled.length]; idx++; }
+  }
+  grid.forEach(cell => recolor(cell));
+}
+
+function getBgColor(p) {
+  switch (document.getElementById('bg').value) {
+    case 'dark': return p.color(30, 30, 34);
+    case 'white': return p.color(245, 243, 240);
+    case 'warm': return p.color(60, 56, 52);
+    case 'cool': return p.color(45, 48, 56);
+    default: return p.color(245, 243, 240);
+  }
+}
+
+// =============================================
+// AUTO-PLAY
+// =============================================
+function startAutoPlay(p) {
+  autoPlaying = true;
+  autoPlayStart = Date.now();
+  document.getElementById('btnPlay').classList.add('playing');
+  document.getElementById('autoplaySection').style.display = 'block';
+  document.getElementById('playIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  scheduleNext(p);
+}
+
+function stopAutoPlay() {
+  autoPlaying = false;
+  clearTimeout(autoPlayTimer);
+  document.getElementById('btnPlay').classList.remove('playing');
+  document.getElementById('playIcon').innerHTML = '<polygon points="5 3 19 12 5 21 5 3" fill="none"/>';
+  document.getElementById('progressRing').querySelector('circle').style.strokeDashoffset = '125.66';
+  if (hidePanel) {
+    document.getElementById('panel').classList.remove('hidden');
+  }
+}
+
+function scheduleNext(p) {
+  if (!autoPlaying) return;
+  const interval = parseInt(document.getElementById('interval').value) * 1000;
+  autoPlayStart = Date.now();
+
+  autoPlayTimer = setTimeout(() => {
+    if (!autoPlaying) return;
+    const transition = document.getElementById('transition').value;
+
+    if (cyclePalette) {
+      currentPal = (currentPal + 1) % PALETTES.length;
+      buildPalUI();
+    }
+
+    if (transition === 'fade') {
+      fading = true;
+      fadeAlpha = 255;
+      setTimeout(() => {
+        generateGrid(p);
+        playRegenerate();
+        fading = false;
+        fadeAlpha = 255;
+      }, 300);
+    } else {
+      generateGrid(p);
+      playRegenerate();
+    }
+
+    scheduleNext(p);
+  }, interval);
+}
+
+function updateProgressRing() {
+  if (!autoPlaying) return;
+  const interval = parseInt(document.getElementById('interval').value) * 1000;
+  const elapsed = Date.now() - autoPlayStart;
+  const progress = Math.min(elapsed / interval, 1);
+  const circumference = 125.66;
+  const offset = circumference * (1 - progress);
+  document.getElementById('progressRing').querySelector('circle').style.strokeDashoffset = offset;
+}
+
+// =============================================
+// EXPORT FUNCTIONS
+// =============================================
+function exportImage(p, width, height, filename, panelW) {
+  // Create offscreen graphics at target resolution
+  const pg = p.createGraphics(width, height);
+  pg.colorMode(pg.RGB, 255);
+  pg.background(getBgColor(p));
+
+  // Generate grid for target dimensions
+  const savedGrid = grid;
+  generateGrid(p, width, height, panelW !== undefined ? panelW : 0);
+  const t = p.millis() * 0.001;
+  for (let cell of grid) drawCellOnGraphics(pg, cell, t);
+  for (let item of freeItems) drawShapeOnGraphics(pg, item);
+
+  // Save
+  pg.save(filename);
+  pg.remove();
+
+  // Restore original grid
+  grid = savedGrid;
+  playSave();
+}
+
+function drawCellOnGraphics(pg, cell, t) {
+  const radius = parseInt(document.getElementById('radius').value);
+  const borderStyle = document.getElementById('border').value;
+  const shapeType = document.getElementById('shape').value;
+  if (cell.children) {
+    for (let child of cell.children) drawCellOnGraphics(pg, child, t);
+  } else {
+    let type = shapeType === 'mixed'
+      ? ['rect','circle','diamond','parallelogram','hexagon'][Math.floor((cell.x*7+cell.y*13)%5)]
+      : shapeType;
+    drawShape(pg, type, cell.x, cell.y, cell.w, cell.h, cell.color, 0, borderStyle, radius);
+  }
+}
+
+function drawShapeOnGraphics(pg, item) {
+  const borderStyle = document.getElementById('border').value;
+  const radius = parseInt(document.getElementById('radius').value);
+  drawShape(pg, item.shapeType, item.x, item.y, item.w, item.h, item.color, item.rot, borderStyle, radius);
+}
+
+function exportVideo(p) {
+  const canvas = document.querySelector('canvas');
+  if (!canvas) return;
+
+  recording = true;
+  document.getElementById('recIndicator').classList.add('show');
+  document.getElementById('exportModal').classList.remove('show');
+  playClick();
+
+  const stream = canvas.captureStream(30);
+  recordedChunks = [];
+
+  try {
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+  } catch(e) {
+    try {
+      mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    } catch(e2) {
+      alert('Video recording not supported in this browser. Try Chrome.');
+      recording = false;
+      document.getElementById('recIndicator').classList.remove('show');
+      return;
+    }
+  }
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data.size > 0) recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'golden-grid-screensaver.webm';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    recording = false;
+    document.getElementById('recIndicator').classList.remove('show');
+    playSave();
+  };
+
+  mediaRecorder.start();
+
+  // Auto-regenerate during recording for the video
+  let regenCount = 0;
+  const regenInterval = setInterval(() => {
+    if (cyclePalette) {
+      currentPal = (currentPal + 1) % PALETTES.length;
+      buildPalUI();
+    }
+    generateGrid(p);
+    regenCount++;
+    if (regenCount >= 4) clearInterval(regenInterval); // 4 regenerations in 10s
+  }, 2500);
+
+  // Stop after 10 seconds
+  setTimeout(() => {
+    clearInterval(regenInterval);
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+  }, 10000);
+}
+
+// =============================================
+// COLOR EXTRACTION FROM IMAGE
+// =============================================
+function extractColorsFromImage(img, count = 10) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const size = 100; // sample at low res for speed
+  canvas.width = size; canvas.height = size;
+  ctx.drawImage(img, 0, 0, size, size);
+  const data = ctx.getImageData(0, 0, size, size).data;
+
+  // K-means-lite: collect pixel colors, cluster them
+  const pixels = [];
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+    if (a < 128) continue; // skip transparent
+    pixels.push([r, g, b]);
+  }
+
+  // Simple quantization: divide color space and pick dominant
+  const buckets = {};
+  pixels.forEach(([r, g, b]) => {
+    const key = `${Math.round(r/32)*32},${Math.round(g/32)*32},${Math.round(b/32)*32}`;
+    if (!buckets[key]) buckets[key] = { sum: [0,0,0], count: 0 };
+    buckets[key].sum[0] += r; buckets[key].sum[1] += g; buckets[key].sum[2] += b;
+    buckets[key].count++;
+  });
+
+  const sorted = Object.values(buckets).sort((a, b) => b.count - a.count);
+  const colors = [];
+  for (let i = 0; i < Math.min(count, sorted.length); i++) {
+    const s = sorted[i];
+    const r = Math.round(s.sum[0] / s.count);
+    const g = Math.round(s.sum[1] / s.count);
+    const b = Math.round(s.sum[2] / s.count);
+    colors.push('#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join(''));
+  }
+  return colors;
+}
+
+// Generate hex-style palette codes from the palette's own colors
+function generatePaletteName(colors) {
+  if (colors && colors.length >= 2) {
+    // Blend first two colors into a fake hex that references the palette
+    const a = colors[0].replace('#','').substring(0,3).toUpperCase();
+    const b = colors[1].replace('#','').substring(0,3).toUpperCase();
+    return '#' + a + b;
+  }
+  // Fallback: random hex-style code
+  const hex = '0123456789ABCDEF';
+  let code = '#';
+  for (let i = 0; i < 6; i++) code += hex[Math.floor(Math.random() * 16)];
+  return code;
+}
+
+// =============================================
+// PALETTE UI
+// =============================================
+function buildPalUI() {
+  const section = document.getElementById('palSection');
+  section.innerHTML = '<div class="section-label">Palette</div>';
+
+  const userPalettes = PALETTES.filter(p => p.userCreated);
+  const builtinPalettes = PALETTES.filter(p => !p.userCreated);
+
+  // User Palettes section
+  if (userPalettes.length > 0) {
+    const userHeader = document.createElement('div');
+    userHeader.className = 'pal-section-header';
+    userHeader.textContent = 'Your Palettes';
+    section.appendChild(userHeader);
+
+    userPalettes.forEach((pal) => {
+      const i = PALETTES.indexOf(pal);
+      const opt = document.createElement('div');
+      opt.className = 'pal-option' + (i === currentPal ? ' active' : '');
+      opt.dataset.palIndex = i;
+
+      // Thumbnail or placeholder
+      let thumbHtml;
+      if (pal.thumbnail) {
+        thumbHtml = `<div class="pal-thumb" style="background-image:url(${pal.thumbnail})"></div>`;
+      } else {
+        thumbHtml = `<div class="pal-thumb-placeholder"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg></div>`;
+      }
+
+      opt.innerHTML = `
+        ${thumbHtml}
+        <div class="pal-dots">${pal.colors.slice(0, 5).map(c =>
+          `<div class="pal-dot" style="background:${c}"></div>`).join('')}</div>
+        <div class="pal-name" data-editable="true">${pal.name}</div>
+        <button class="pal-delete" data-delete="${i}" title="Delete palette">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>`;
+      section.appendChild(opt);
+    });
+  }
+
+  // Built-in section
+  const builtinHeader = document.createElement('div');
+  builtinHeader.className = 'pal-section-header';
+  builtinHeader.textContent = userPalettes.length > 0 ? 'Built-in' : 'Palettes';
+  section.appendChild(builtinHeader);
+
+  builtinPalettes.forEach((pal) => {
+    const i = PALETTES.indexOf(pal);
+    const opt = document.createElement('div');
+    opt.className = 'pal-option' + (i === currentPal ? ' active' : '');
+    opt.dataset.palIndex = i;
+    opt.innerHTML = `
+      <div class="pal-dots">${pal.colors.slice(0, 7).map(c =>
+        `<div class="pal-dot" style="background:${c}"></div>`).join('')}</div>
+      <div class="pal-name">${pal.name}</div>`;
+    section.appendChild(opt);
+  });
+
+  // Upload / Add palette controls
+  const controls = document.createElement('div');
+  controls.style.cssText = 'display:flex; gap:6px; margin-top:10px;';
+  controls.innerHTML = `
+    <label id="uploadPalBtn" style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px;
+      padding:7px 0; border-radius:8px; cursor:pointer; font-size:9px; font-weight:500;
+      color:#999; letter-spacing:0.3px; background:#f5f5f5;
+      border:1px dashed #ddd; transition: all 0.2s;">
+      <svg style="width:12px;height:12px;stroke:#999;stroke-width:2;fill:none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload
+      <input type="file" id="palUpload" accept="image/*" style="display:none">
+    </label>
+    <button id="addCustomPalBtn" style="flex:1; display:flex; align-items:center; justify-content:center; gap:5px;
+      padding:7px 0; border-radius:8px; cursor:pointer; font-size:9px; font-weight:500;
+      color:#999; letter-spacing:0.3px; background:#f5f5f5;
+      border:1px dashed #ddd; transition: all 0.2s; font-family:Inter,sans-serif;">
+      <svg style="width:12px;height:12px;stroke:#999;stroke-width:2;fill:none" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Custom
+    </button>`;
+  section.appendChild(controls);
+
+  // Color picker area (hidden by default) — includes manual picking + harmony generation
+  const pickerArea = document.createElement('div');
+  pickerArea.id = 'colorPickerArea';
+  pickerArea.style.cssText = 'display:none; margin-top:10px; padding:10px; border-radius:8px; background:#fafafa; border:1px solid #eee;';
+  pickerArea.innerHTML = `
+    <div style="font-size:8px;color:#bbb;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Pick colors</div>
+    <div id="customSwatches" style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;min-height:20px;"></div>
+    <div style="display:flex;gap:4px;align-items:center;margin-bottom:6px;">
+      <input type="color" id="colorPicker" value="#E8356D" style="width:22px;height:22px;border:1px solid #ddd;border-radius:5px;cursor:pointer;padding:0;">
+      <button id="addSwatchBtn" class="custom-action-btn">+ Add</button>
+      <span id="swatchCount" style="font-size:9px;color:#ccc;margin-left:auto;">0</span>
+      <button id="doneCustomPal" class="custom-action-btn">Save</button>
+    </div>
+
+    <div class="harmony-divider"></div>
+    <div style="font-size:8px;color:#bbb;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Or generate harmony</div>
+    <div class="harmony-row">
+      <div class="harmony-color-btn" id="harmonyColorBtn" style="background:#E8356D;">
+        <input type="color" id="harmonyColorPicker" value="#E8356D">
+      </div>
+      <select class="harmony-select" id="harmonyTypeSelect">
+        <option value="complementary">Complementary</option>
+        <option value="analogous">Analogous</option>
+        <option value="triadic">Triadic</option>
+        <option value="split-complementary">Split-comp</option>
+      </select>
+      <button id="harmonyGenerateBtn" class="custom-action-btn">Add</button>
+    </div>
+    <div class="harmony-row" style="margin-top:4px;">
+      <div class="harmony-preview" id="harmonyPreview"></div>
+    </div>`;
+  section.appendChild(pickerArea);
+
+  // Update harmony preview on load
+  updateHarmonyPreview();
+}
+
+function updateHarmonyPreview() {
+  const colorPicker = document.getElementById('harmonyColorPicker');
+  const typeSelect = document.getElementById('harmonyTypeSelect');
+  if (!colorPicker || !typeSelect) return;
+
+  const baseColor = colorPicker.value;
+  const harmonyType = typeSelect.value;
+  const colors = generateHarmony(baseColor, harmonyType);
+
+  const preview = document.getElementById('harmonyPreview');
+  if (preview) {
+    preview.innerHTML = colors.map(c =>
+      `<div class="harmony-preview-dot" style="background:${c}"></div>`
+    ).join('');
+  }
+}
+
+function deletePalette(index) {
+  if (index < 0 || index >= PALETTES.length) return;
+  if (!PALETTES[index].userCreated) return; // Can't delete built-in
+
+  PALETTES.splice(index, 1);
+  if (currentPal >= PALETTES.length) currentPal = PALETTES.length - 1;
+  if (currentPal < 0) currentPal = 0;
+  saveUserPalettes();
+  buildPalUI();
+}
+
+function renamePalette(index, newName) {
+  if (index < 0 || index >= PALETTES.length) return;
+  if (!PALETTES[index].userCreated) return;
+
+  PALETTES[index].name = newName;
+  saveUserPalettes();
+}
+
+// =============================================
+// P5 SKETCH
+// =============================================
+new p5(function(p) {
+  p.setup = function() {
+    p.createCanvas(p.windowWidth, p.windowHeight);
+    p.colorMode(p.RGB, 255);
+    loadUserPalettes(); // Load saved user palettes from localStorage
+    buildPalUI();
+    generateGrid(p);
+  };
+
+  p.draw = function() {
+    p.background(getBgColor(p));
+    const t = p.millis() * 0.001;
+
+    for (let cell of grid) drawCell(p, cell, t);
+    for (let item of freeItems) drawFreeItem(p, item, t);
+
+    // Fade overlay for transitions
+    if (fading) {
+      const bg = getBgColor(p);
+      p.noStroke();
+      p.fill(p.red(bg), p.green(bg), p.blue(bg), 200);
+      p.rect(0, 0, p.width, p.height);
+    }
+
+    // Update progress ring
+    if (autoPlaying) updateProgressRing();
+  };
+
+  p.windowResized = function() {
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    generateGrid(p);
+  };
+
+  p.mousePressed = function() {
+    if (p.mouseX > p.width - 270) return;
+    const idx = findClickedSquare(p.mouseX, p.mouseY);
+    if (idx >= 0) {
+      playCellTone(grid[idx].x, grid[idx].y, grid[idx].w, grid[idx].h);
+      reSubdivide(idx);
+    }
+  };
+
+  p.keyPressed = function() {
+    if (p.key === ' ') { playRegenerate(); generateGrid(p); return false; }
+    if (p.key === 's' || p.key === 'S') { playSave(); p.saveCanvas('lesa-golden-grid', 'png'); return false; }
+    if (p.key === 'r' || p.key === 'R') { document.getElementById('btnRandom').click(); return false; }
+    if (p.key === 'p' || p.key === 'P') {
+      if (autoPlaying) stopAutoPlay(); else startAutoPlay(p);
+      return false;
+    }
+    if (p.key === 'o' || p.key === 'O') {
+      if (autoPlaying) { playStop(); stopAutoPlay(); }
+      return false;
+    }
+    if (p.key === 'f' || p.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+      return false;
+    }
+    if (p.keyCode === p.LEFT_ARROW) {
+      currentPal = (currentPal - 1 + PALETTES.length) % PALETTES.length;
+      buildPalUI(); shuffleColors(); playPaletteChord(currentPal);
+    }
+    if (p.keyCode === p.RIGHT_ARROW) {
+      currentPal = (currentPal + 1) % PALETTES.length;
+      buildPalUI(); shuffleColors(); playPaletteChord(currentPal);
+    }
+  };
+
+  // Wire action buttons
+  document.getElementById('btnRegen').addEventListener('click', () => { playRegenerate(); generateGrid(p); });
+  document.getElementById('btnShuffle').addEventListener('click', () => { playShuffle(); shuffleColors(); });
+
+  // Random Mix - randomize everything
+  document.getElementById('btnRandom').addEventListener('click', () => {
+    // Shuffle colors within current palette
+    shuffleColors();
+
+    // Random shape
+    const shapes = ['rect', 'circle', 'diamond', 'parallelogram', 'hexagon', 'mixed'];
+    document.getElementById('shape').value = shapes[Math.floor(Math.random() * shapes.length)];
+
+    // Random layout
+    const layouts = ['grid', 'fibonacci-grid', 'radial'];
+    document.getElementById('layout').value = layouts[Math.floor(Math.random() * layouts.length)];
+
+    // Random depth (2-6)
+    document.getElementById('depth').value = Math.floor(Math.random() * 5) + 2;
+
+    // Random spacing (0-8)
+    document.getElementById('spacing').value = Math.floor(Math.random() * 9);
+
+    // Random border
+    const borders = ['none', 'solid', 'double'];
+    document.getElementById('border').value = borders[Math.floor(Math.random() * borders.length)];
+
+    // Random radius (0-20)
+    document.getElementById('radius').value = Math.floor(Math.random() * 21);
+
+    playRegenerate();
+    generateGrid(p);
+  });
+
+  document.getElementById('btnPlay').addEventListener('click', () => {
+    if (autoPlaying) { playStop(); stopAutoPlay(); } else { playStart(); startAutoPlay(p); }
+  });
+
+  document.getElementById('btnExport').addEventListener('click', () => {
+    playExport();
+    document.getElementById('exportModal').classList.add('show');
+  });
+  document.getElementById('modalClose').addEventListener('click', () => {
+    document.getElementById('exportModal').classList.remove('show');
+  });
+
+  // Export options
+  document.getElementById('expDesktop').addEventListener('click', () => {
+    document.getElementById('exportModal').classList.remove('show');
+    exportImage(p, 2560, 1440, 'golden-grid-desktop-wallpaper');
+  });
+  document.getElementById('expPhone').addEventListener('click', () => {
+    document.getElementById('exportModal').classList.remove('show');
+    exportImage(p, 1170, 2532, 'golden-grid-phone-wallpaper');
+  });
+  document.getElementById('expSquare').addEventListener('click', () => {
+    document.getElementById('exportModal').classList.remove('show');
+    exportImage(p, 2160, 2160, 'golden-grid-square');
+  });
+  document.getElementById('expPrint').addEventListener('click', () => {
+    document.getElementById('exportModal').classList.remove('show');
+    exportImage(p, 4800, 4800, 'golden-grid-print');
+  });
+  document.getElementById('expVideo').addEventListener('click', () => {
+    exportVideo(p);
+  });
+  document.getElementById('expCurrent').addEventListener('click', () => {
+    document.getElementById('exportModal').classList.remove('show');
+    playSave();
+    p.saveCanvas('golden-grid-current', 'png');
+  });
+
+  document.getElementById('btnSound').addEventListener('click', () => {
+    soundOn = !soundOn;
+    const icon = document.getElementById('soundIcon');
+    const btn = document.getElementById('btnSound');
+    if (soundOn) {
+      icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>';
+      btn.classList.remove('muted');
+      playSoundOn();
+    } else {
+      playSoundOff();
+      icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+      btn.classList.add('muted');
+    }
+  });
+
+  document.getElementById('animateToggle').addEventListener('click', function() {
+    animateOn = !animateOn; this.classList.toggle('on', animateOn); playClick();
+  });
+
+  document.getElementById('cyclePalToggle').addEventListener('click', function() {
+    cyclePalette = !cyclePalette; this.classList.toggle('on', cyclePalette); playClick();
+  });
+
+  document.getElementById('hidePanelToggle').addEventListener('click', function() {
+    hidePanel = !hidePanel; this.classList.toggle('on', hidePanel); playClick();
+    togglePanelVisibility();
+  });
+
+  // Panel toggle button — always visible, works anytime
+  let panelVisible = true;
+  function togglePanelVisibility() {
+    panelVisible = !panelVisible;
+    const panel = document.getElementById('panel');
+    const tog = document.getElementById('panelToggle');
+    if (panelVisible) {
+      panel.classList.remove('hidden');
+      tog.classList.remove('collapsed');
+    } else {
+      panel.classList.add('hidden');
+      tog.classList.add('collapsed');
+    }
+    // Regenerate grid to use full width when panel hidden
+    setTimeout(() => generateGrid(p), 400);
+  }
+
+  document.getElementById('panelToggle').addEventListener('click', () => {
+    playClick();
+    togglePanelVisibility();
+  });
+
+  // Mobile panel expand/collapse (tap header to toggle)
+  const panelHeader = document.querySelector('.panel-header');
+  panelHeader.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768) {
+      e.stopPropagation();
+      const panel = document.getElementById('panel');
+      panel.classList.toggle('expanded');
+      playClick();
+    }
+  });
+
+  // Swipe down to collapse on mobile
+  let touchStartY = 0;
+  document.getElementById('panel').addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.getElementById('panel').addEventListener('touchend', (e) => {
+    const touchEndY = e.changedTouches[0].clientY;
+    const panel = document.getElementById('panel');
+    if (window.innerWidth <= 768 && touchEndY - touchStartY > 50 && panel.classList.contains('expanded')) {
+      panel.classList.remove('expanded');
+      playClick();
+    }
+  }, { passive: true });
+
+  // Interval slider
+  document.getElementById('interval').addEventListener('input', function() {
+    document.getElementById('intervalV').textContent = this.value + 's';
+    playTick();
+  });
+
+  // Other slider wiring
+  let lastTickTime = 0;
+  ['gap', 'outerGap', 'depth', 'innerGap', 'radius', 'rot', 'scale', 'overlap', 'breathe'].forEach(id => {
+    const el = document.getElementById(id);
+    const vEl = document.getElementById(id + 'V');
+    el.addEventListener('input', () => {
+      if (vEl) vEl.textContent = el.value;
+      const now = Date.now();
+      if (now - lastTickTime > 60) { playTick(); lastTickTime = now; }
+    });
+  });
+
+  ['cols', 'splitDir', 'border', 'bg', 'layout', 'shape'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => { playClick(); generateGrid(p); });
+  });
+  ['gap', 'outerGap', 'depth', 'innerGap', 'rot', 'scale', 'overlap', 'breathe'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      clearTimeout(window._rg);
+      window._rg = setTimeout(() => generateGrid(p), 150);
+    });
+  });
+
+  // Close modal on background click
+  document.getElementById('exportModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('show');
+  });
+
+  // About modal
+  document.getElementById('aboutBtn').addEventListener('click', () => {
+    document.getElementById('aboutModal').classList.add('show');
+  });
+  document.getElementById('aboutClose').addEventListener('click', () => {
+    document.getElementById('aboutModal').classList.remove('show');
+  });
+  document.getElementById('aboutModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('show');
+  });
+
+  // Phi example panels
+  document.querySelectorAll('.phi-item[data-panel]').forEach(item => {
+    item.addEventListener('click', () => {
+      const panelId = item.dataset.panel;
+      const panel = document.getElementById(panelId);
+      const wasOpen = panel.classList.contains('show');
+      // Close all panels
+      document.querySelectorAll('.phi-panel').forEach(p => p.classList.remove('show'));
+      // Toggle clicked panel
+      if (!wasOpen) panel.classList.add('show');
+    });
+  });
+  // Close panels when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.phi-row-wrap')) {
+      document.querySelectorAll('.phi-panel').forEach(p => p.classList.remove('show'));
+    }
+  });
+
+  // =============================================
+  // PALETTE UPLOAD & CUSTOM BUILDER
+  // =============================================
+  let customSwatches = [];
+
+  // Use event delegation for dynamically-rebuilt palette controls
+  document.getElementById('palSection').addEventListener('change', function(e) {
+    // Image upload for palette extraction
+    if (e.target.id === 'palUpload') {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+          const colors = extractColorsFromImage(img, 10);
+          if (colors.length >= 3) {
+            // Create thumbnail (48x48)
+            const thumbCanvas = document.createElement('canvas');
+            thumbCanvas.width = 48; thumbCanvas.height = 48;
+            const thumbCtx = thumbCanvas.getContext('2d');
+            thumbCtx.drawImage(img, 0, 0, 48, 48);
+            const thumbnail = thumbCanvas.toDataURL('image/jpeg', 0.7);
+
+            const name = generatePaletteName(colors);
+            PALETTES.push({
+              name,
+              colors,
+              thumbnail,
+              userCreated: true,
+              createdAt: Date.now()
+            });
+            currentPal = PALETTES.length - 1;
+            saveUserPalettes();
+            buildPalUI();
+            generateGrid(p);
+            playPaletteChord(currentPal);
+          }
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
+
+    // Harmony color picker
+    if (e.target.id === 'harmonyColorPicker') {
+      const btn = document.getElementById('harmonyColorBtn');
+      if (btn) btn.style.background = e.target.value;
+      updateHarmonyPreview();
+    }
+
+    // Harmony type select
+    if (e.target.id === 'harmonyTypeSelect') {
+      updateHarmonyPreview();
+      playClick();
+    }
+  });
+
+  document.getElementById('palSection').addEventListener('click', function(e) {
+    // Palette selection
+    const palOption = e.target.closest('.pal-option');
+    if (palOption && !e.target.closest('.pal-delete') && !e.target.closest('.pal-name[data-editable]')) {
+      const index = parseInt(palOption.dataset.palIndex);
+      if (!isNaN(index)) {
+        currentPal = index;
+        document.querySelectorAll('.pal-option').forEach(b => b.classList.remove('active'));
+        palOption.classList.add('active');
+        shuffleColors();
+        playPaletteChord(index);
+        return;
+      }
+    }
+
+    // Delete palette
+    const deleteBtn = e.target.closest('.pal-delete');
+    if (deleteBtn) {
+      const index = parseInt(deleteBtn.dataset.delete);
+      if (!isNaN(index)) {
+        deletePalette(index);
+        generateGrid(p);
+        playClick();
+        return;
+      }
+    }
+
+    // Editable palette name — click to edit
+    const editableName = e.target.closest('.pal-name[data-editable]');
+    if (editableName) {
+      const palOption = editableName.closest('.pal-option');
+      const index = parseInt(palOption.dataset.palIndex);
+      if (isNaN(index)) return;
+
+      const currentName = editableName.textContent;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'pal-name-input';
+      input.value = currentName;
+
+      editableName.style.display = 'none';
+      editableName.parentNode.insertBefore(input, editableName.nextSibling);
+      input.focus();
+      input.select();
+
+      const saveAndRestore = () => {
+        const newName = input.value.trim() || currentName;
+        renamePalette(index, newName);
+        editableName.textContent = newName;
+        editableName.style.display = '';
+        input.remove();
+      };
+
+      input.addEventListener('blur', saveAndRestore);
+      input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') { ev.preventDefault(); saveAndRestore(); }
+        if (ev.key === 'Escape') { input.value = currentName; saveAndRestore(); }
+      });
+      return;
+    }
+
+    // Generate harmony palette
+    if (e.target.closest('#harmonyGenerateBtn')) {
+      const colorPicker = document.getElementById('harmonyColorPicker');
+      const typeSelect = document.getElementById('harmonyTypeSelect');
+      if (!colorPicker || !typeSelect) return;
+
+      const baseColor = colorPicker.value;
+      const harmonyType = typeSelect.value;
+      const colors = generateHarmony(baseColor, harmonyType);
+      const name = generatePaletteName(colors);
+
+      PALETTES.push({
+        name,
+        colors,
+        userCreated: true,
+        createdAt: Date.now()
+      });
+      currentPal = PALETTES.length - 1;
+      saveUserPalettes();
+      buildPalUI();
+      generateGrid(p);
+      playPaletteChord(currentPal);
+      return;
+    }
+
+    // Custom palette builder controls
+    const target = e.target.closest('#addCustomPalBtn, #addSwatchBtn, #doneCustomPal');
+    if (!target) return;
+
+    if (target.id === 'addCustomPalBtn') {
+      const area = document.getElementById('colorPickerArea');
+      area.style.display = area.style.display === 'none' ? 'block' : 'none';
+      customSwatches = [];
+      const sw = document.getElementById('customSwatches');
+      if (sw) sw.innerHTML = '';
+      const sc = document.getElementById('swatchCount');
+      if (sc) sc.textContent = '0';
+      playClick();
+    }
+
+    if (target.id === 'addSwatchBtn') {
+      const picker = document.getElementById('colorPicker');
+      if (!picker) return;
+      const color = picker.value;
+      customSwatches.push(color);
+      const sw = document.createElement('div');
+      sw.style.cssText = `width:16px;height:16px;border-radius:3px;background:${color};cursor:pointer;transition:transform 0.15s;`;
+      sw.title = `${color} — click to remove`;
+      sw.addEventListener('click', () => {
+        const idx = customSwatches.indexOf(color);
+        if (idx > -1) customSwatches.splice(idx, 1);
+        sw.remove();
+        const sc = document.getElementById('swatchCount');
+        if (sc) sc.textContent = customSwatches.length;
+      });
+      const container = document.getElementById('customSwatches');
+      if (container) container.appendChild(sw);
+      const sc = document.getElementById('swatchCount');
+      if (sc) sc.textContent = customSwatches.length;
+      playTick();
+    }
+
+    if (target.id === 'doneCustomPal') {
+      if (customSwatches.length < 2) return;
+      const name = generatePaletteName(customSwatches);
+      PALETTES.push({
+        name,
+        colors: [...customSwatches],
+        userCreated: true,
+        createdAt: Date.now()
+      });
+      currentPal = PALETTES.length - 1;
+      saveUserPalettes();
+      buildPalUI();
+      generateGrid(p);
+      playPaletteChord(currentPal);
+      const area = document.getElementById('colorPickerArea');
+      if (area) area.style.display = 'none';
+      customSwatches = [];
+    }
+  });
+
+  // =============================================
+  // DIETER RAMS SPEAKER — Generative ambient music
+  // Uses Web Audio API to create original ambient tones
+  // No copyright issues — it's procedurally generated!
+  // =============================================
+  let ramsPlaying = false;
+  let ramsNodes = [];
+  const ramsTitles = [
+    'Ambient Grid No. 1', 'Golden Drift', 'Ratio in C',
+    'Subdivide', 'Fibonacci Haze', 'PHI Minor',
+    'Braun Tone 606', 'Module Pulse', 'Grid Whisper',
+    'Harmonic Section', 'Quiet Ratio', 'System Hum'
+  ];
+
+  function ramsGenerateAmbient() {
+    ensureAudio();
+    const t = audioCtx.currentTime;
+    // Create layered ambient drone from golden ratio intervals
+    const base = 110 + Math.random() * 55; // A2-D3 range
+    const ratios = [1, PHI_RATIO, 1/PHI_RATIO, 2, PHI_RATIO * 2];
+
+    ratios.forEach((ratio, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const pan = audioCtx.createStereoPanner();
+      osc.type = i < 2 ? 'sine' : 'triangle';
+      osc.frequency.value = base * ratio;
+      // Slow LFO on frequency for gentle movement
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.value = 0.05 + Math.random() * 0.1;
+      lfoGain.gain.value = base * ratio * 0.008;
+      lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+      lfo.start(t);
+
+      pan.pan.value = (i / ratios.length) * 2 - 1; // spread across stereo
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.015 / (i + 1), t + 3); // very gentle fade in
+      osc.connect(gain); gain.connect(pan); pan.connect(compressor);
+      osc.start(t);
+      ramsNodes.push({ osc, gain, lfo, pan });
+    });
+
+    // Pick a title based on current week of year
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const week = Math.floor((now - startOfYear) / (7 * 24 * 60 * 60 * 1000)) % ramsTitles.length;
+    document.getElementById('ramsSongTitle').textContent = ramsTitles[week];
+  }
+
+  function ramsStopAmbient() {
+    const t = audioCtx ? audioCtx.currentTime : 0;
+    ramsNodes.forEach(({ osc, gain, lfo }) => {
+      gain.gain.linearRampToValueAtTime(0.001, t + 2);
+      osc.stop(t + 2.1);
+      lfo.stop(t + 2.1);
+    });
+    ramsNodes = [];
+  }
+
+  document.getElementById('ramsSpeaker').addEventListener('click', () => {
+    ramsPlaying = !ramsPlaying;
+    const speaker = document.getElementById('ramsSpeaker');
+    const rings = document.getElementById('ramsRings');
+    if (ramsPlaying) {
+      speaker.classList.add('playing');
+      rings.style.opacity = '1';
+      ramsGenerateAmbient();
+    } else {
+      speaker.classList.remove('playing');
+      rings.style.opacity = '0';
+      ramsStopAmbient();
+    }
+  });
+
+}, document.body);
+</script>
+</body>
+</html>

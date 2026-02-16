@@ -1,0 +1,19 @@
+{
+  "name": "golden-grid",
+  "version": "1.0.0",
+  "description": "Generative art tool using golden ratio subdivisions - your colors in perfect ratio",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve . -l 3000"
+  },
+  "keywords": [
+    "generative-art",
+    "p5js",
+    "golden-ratio",
+    "color-palette",
+    "phi"
+  ],
+  "author": "Lesa",
+  "license": "MIT"
+}
