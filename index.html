@@ -462,6 +462,18 @@ select:focus { border-color: #1d1d1f; }
    MOBILE & TABLET RESPONSIVE
    ========================================== */
 @media (max-width: 768px) {
+  /* Hide panel toggle on mobile */
+  #panelToggle { display: none; }
+
+  /* Canvas fills screen */
+  canvas {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 60px) !important;
+  }
+
   #panel {
     position: fixed; top: auto; bottom: 0; right: 0; left: 0;
     width: 100%; height: auto; max-height: 70vh;
@@ -474,8 +486,9 @@ select:focus { border-color: #1d1d1f; }
   #panel.hidden { transform: translateY(100%); }
 
   .panel-header {
-    padding: 12px 20px; cursor: pointer;
+    padding: 16px 20px; cursor: pointer;
     display: flex; align-items: center; justify-content: space-between;
+    position: relative;
   }
   .panel-header::after {
     content: ''; width: 32px; height: 4px; background: #ddd;
@@ -484,15 +497,9 @@ select:focus { border-color: #1d1d1f; }
 
   .section { padding: 12px 16px; }
   .actions { padding: 12px 16px; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .action-btn { width: 40px; height: 40px; }
+  .action-btn { width: 44px; height: 44px; }
 
-  #hints {
-    grid-template-columns: 1fr 1fr;
-    padding: 12px 16px 20px; gap: 6px 10px;
-  }
-  #hints .hint { font-size: 8px; }
-  #hints kbd { padding: 2px 4px; font-size: 7px; }
-
+  #hints { display: none; }
   #ramsPlayer { display: none; }
 
   /* About modal mobile */
@@ -1422,7 +1429,8 @@ function generateGrid(p, targetW, targetH, panelW) {
   const rotAmt = parseInt(document.getElementById('rot').value) / 100;
   const scaleVal = parseInt(document.getElementById('scale').value);
   const overlapVal = parseInt(document.getElementById('overlap').value) / 100;
-  const pw = panelW !== undefined ? panelW : (document.getElementById('panel').classList.contains('hidden') ? 0 : 260);
+  const isMobile = window.innerWidth <= 768;
+  const pw = panelW !== undefined ? panelW : (isMobile ? 0 : (document.getElementById('panel').classList.contains('hidden') ? 0 : 260));
   const tw = targetW || p.width;
   const th = targetH || p.height;
 
