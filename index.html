@@ -481,18 +481,31 @@ select:focus { border-color: #1d1d1f; }
     position: fixed !important; top: 100vw !important; bottom: 0 !important;
     right: 0 !important; left: 0 !important;
     width: 100% !important; height: calc(100vh - 100vw) !important;
+    height: calc(100svh - 100vw) !important; /* Small viewport height for Safari */
     border-left: none; border-top: 1px solid #ddd;
     border-radius: 0;
     transform: none !important;
     background: #fafafa !important;
     overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom, 20px);
   }
 
   /* When panel is collapsed on mobile, show only header */
   #panel.mobile-collapsed {
-    height: 44px !important;
+    height: 50px !important;
     overflow: hidden !important;
   }
+
+  /* Show hints on mobile (simplified) */
+  #hints {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 8px 12px 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    gap: 4px 8px;
+  }
+  #hints .hint { font-size: 7px; }
+  #hints kbd { padding: 1px 3px; font-size: 6px; }
 
   .panel-header {
     padding: 10px 16px;
@@ -516,7 +529,6 @@ select:focus { border-color: #1d1d1f; }
   .actions { padding: 12px 16px; gap: 8px; flex-wrap: wrap; justify-content: center; }
   .action-btn { width: 44px; height: 44px; }
 
-  #hints { display: none; }
   #ramsPlayer { display: none; }
 
   /* About modal mobile */
@@ -1996,7 +2008,10 @@ function renamePalette(index, newName) {
 // =============================================
 new p5(function(p) {
   p.setup = function() {
-    p.createCanvas(p.windowWidth, p.windowHeight);
+    const isMobile = window.innerWidth <= 768;
+    const w = isMobile ? window.innerWidth : p.windowWidth;
+    const h = isMobile ? window.innerWidth : p.windowHeight; // Square on mobile
+    p.createCanvas(w, h);
     p.colorMode(p.RGB, 255);
     loadUserPalettes(); // Load saved user palettes from localStorage
     buildPalUI();
@@ -2023,7 +2038,10 @@ new p5(function(p) {
   };
 
   p.windowResized = function() {
-    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    const isMobile = window.innerWidth <= 768;
+    const w = isMobile ? window.innerWidth : p.windowWidth;
+    const h = isMobile ? window.innerWidth : p.windowHeight; // Square on mobile
+    p.resizeCanvas(w, h);
     generateGrid(p);
   };
 
