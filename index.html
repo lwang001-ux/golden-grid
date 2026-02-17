@@ -80,17 +80,19 @@ body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica N
 
 input[type="range"] {
   -webkit-appearance: none; appearance: none;
-  width: 88px; height: 2px; background: #e0e0e0; border-radius: 1px; outline: none;
+  width: 88px; height: 6px; outline: none;
+  background-image: radial-gradient(circle, #ccc 1.5px, transparent 1.5px);
+  background-size: 8px 6px;
+  background-position: 0 center;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 12px; height: 12px; border-radius: 50%;
+  width: 8px; height: 8px; border-radius: 50%;
   background: #1d1d1f; cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.12);
-  border: none;
+  transition: transform 0.1s;
+  box-shadow: none; border: none;
 }
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 input[type="range"]:active::-webkit-slider-thumb { background: #333; }
 
 select {
