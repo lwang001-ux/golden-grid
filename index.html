@@ -2463,61 +2463,97 @@ new p5(function(p) {
   // Welcome modal (first visit)
   const WELCOME_KEY = 'golden-grid-welcome-seen';
 
-  // Draw dynamic pattern background
+  // Draw dynamic pattern background (matching the app's scatter style)
   function drawWelcomePattern() {
     const canvas = document.getElementById('welcomePattern');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Colors - soft pastels matching the app palette
+    // Colors matching the screenshots - coral, yellow, lavender
     const colors = [
-      '#E8707A', '#F2A65A', '#E8CF5A', '#9B8FD4', '#D4A5C9',
-      '#8B9A4A', '#6B9A9A', '#E8A040', '#C9A5D4'
+      { hex: '#C85A5A', weight: 2 },  // coral red
+      { hex: '#E8CF5A', weight: 2 },  // yellow
+      { hex: '#B8A8D8', weight: 3 },  // lavender (more of this)
+      { hex: '#D4A5C9', weight: 1 },  // pink
+      { hex: '#9B8FD4', weight: 2 },  // purple
     ];
+    const colorPool = colors.flatMap(c => Array(c.weight).fill(c.hex));
 
     // Background
     ctx.fillStyle = '#faf9f7';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw scattered shapes
-    const shapes = ['circle', 'pill', 'diamond', 'rect'];
-    const cellSize = 45;
-    const cols = Math.ceil(canvas.width / cellSize) + 1;
-    const rows = Math.ceil(canvas.height / cellSize) + 1;
+    // Shape types matching the patterns
+    const shapes = [
+      'circle', 'circle', 'circle',           // circles are common
+      'hPill', 'hPill', 'vPill',              // horizontal & vertical pills
+      'hBar', 'hBar', 'vBar',                 // thin bars/lines
+      'diamond', 'diamond',                    // diamonds
+      'dot', 'dot', 'dot',                    // tiny dots
+      'roundRect'                              // rounded rectangles
+    ];
+
+    const cellSize = 35;
+    const cols = Math.ceil(canvas.width / cellSize) + 2;
+    const rows = Math.ceil(canvas.height / cellSize) + 2;
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        if (Math.random() > 0.7) continue; // Skip some cells
+        // Draw 1-3 shapes per cell with some empty cells
+        const numShapes = Math.random() < 0.3 ? 0 : Math.random() < 0.7 ? 1 : Math.floor(Math.random() * 3) + 1;
 
-        const x = col * cellSize + (Math.random() - 0.5) * 20;
-        const y = row * cellSize + (Math.random() - 0.5) * 20;
-        const size = 4 + Math.random() * 16;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const alpha = 0.3 + Math.random() * 0.5;
-        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        for (let s = 0; s < numShapes; s++) {
+          const x = col * cellSize + Math.random() * cellSize;
+          const y = row * cellSize + Math.random() * cellSize;
+          const color = colorPool[Math.floor(Math.random() * colorPool.length)];
+          const alpha = 0.4 + Math.random() * 0.5;
+          const shape = shapes[Math.floor(Math.random() * shapes.length)];
 
-        ctx.fillStyle = color;
-        ctx.globalAlpha = alpha;
+          ctx.fillStyle = color;
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
 
-        ctx.beginPath();
-        if (shape === 'circle') {
-          ctx.arc(x, y, size / 2, 0, Math.PI * 2);
-          ctx.fill();
-        } else if (shape === 'pill') {
-          const w = size * (1.5 + Math.random() * 2);
-          const h = size * 0.6;
-          const r = h / 2;
-          ctx.roundRect(x - w/2, y - h/2, w, h, r);
-          ctx.fill();
-        } else if (shape === 'diamond') {
-          ctx.save();
-          ctx.translate(x, y);
-          ctx.rotate(Math.PI / 4);
-          ctx.fillRect(-size/3, -size/3, size/1.5, size/1.5);
-          ctx.restore();
-        } else {
-          ctx.fillRect(x - size/2, y - size/4, size, size/2);
+          if (shape === 'circle') {
+            const r = 3 + Math.random() * 12;
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (shape === 'hPill') {
+            const w = 15 + Math.random() * 30;
+            const h = 6 + Math.random() * 8;
+            ctx.roundRect(x - w/2, y - h/2, w, h, h/2);
+            ctx.fill();
+          } else if (shape === 'vPill') {
+            const w = 6 + Math.random() * 8;
+            const h = 15 + Math.random() * 30;
+            ctx.roundRect(x - w/2, y - h/2, w, h, w/2);
+            ctx.fill();
+          } else if (shape === 'hBar') {
+            const w = 10 + Math.random() * 25;
+            const h = 2 + Math.random() * 4;
+            ctx.fillRect(x - w/2, y - h/2, w, h);
+          } else if (shape === 'vBar') {
+            const w = 2 + Math.random() * 4;
+            const h = 10 + Math.random() * 25;
+            ctx.fillRect(x - w/2, y - h/2, w, h);
+          } else if (shape === 'diamond') {
+            const size = 4 + Math.random() * 10;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(Math.PI / 4);
+            ctx.fillRect(-size/2, -size/2, size, size);
+            ctx.restore();
+          } else if (shape === 'dot') {
+            const r = 1 + Math.random() * 3;
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (shape === 'roundRect') {
+            const w = 12 + Math.random() * 20;
+            const h = 10 + Math.random() * 15;
+            const r = 3 + Math.random() * 4;
+            ctx.roundRect(x - w/2, y - h/2, w, h, r);
+            ctx.fill();
+          }
         }
       }
     }
