@@ -1350,19 +1350,27 @@ function playTick() {
   flashSoundDot();
 }
 
-// Warm chord — palette selection (different root per palette)
+// Happy chime — palette selection (celebratory ascending notes)
 function playPaletteChord(index) {
   if (!soundOn) return; ensureAudio();
   const t = audioCtx.currentTime;
-  const baseNotes = [261.6, 293.7, 329.6, 392.0, 440.0];
-  const base = baseNotes[index % baseNotes.length];
-  [1, 1.25, 1.5].forEach((ratio, i) => {
-    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-    osc.type = 'triangle'; osc.frequency.value = base * ratio;
-    gain.gain.setValueAtTime(0, t + i * 0.04);
-    gain.gain.linearRampToValueAtTime(0.07, t + i * 0.04 + 0.03);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-    osc.connect(gain); gain.connect(compressor); osc.start(t + i * 0.04); osc.stop(t + 0.6);
+  // Major chord arpeggios - different starting note per palette
+  const roots = [523.3, 587.3, 659.3, 698.5, 784.0]; // C5, D5, E5, F5, G5
+  const root = roots[index % roots.length];
+  // Play ascending major triad (happy sound)
+  const notes = [root, root * 1.25, root * 1.5, root * 2]; // root, third, fifth, octave
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, t + i * 0.06);
+    gain.gain.linearRampToValueAtTime(0.08, t + i * 0.06 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.06 + 0.3);
+    osc.connect(gain);
+    gain.connect(compressor);
+    osc.start(t + i * 0.06);
+    osc.stop(t + i * 0.06 + 0.35);
   });
   flashSoundDot();
 }
