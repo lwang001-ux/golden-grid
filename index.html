@@ -78,53 +78,62 @@ body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica N
   font-variant-numeric: tabular-nums; color: #1d1d1f;
 }
 
+/* Dieter Rams style sliders — black, elegant, minimal */
 input[type="range"] {
   -webkit-appearance: none; appearance: none;
-  width: 88px; height: 2px; background: #e0e0e0; border-radius: 1px; outline: none;
+  width: 80px; height: 1px; background: #1d1d1f; border-radius: 0; outline: none;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: #F47A20; cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.12);
-  border: 1px solid rgba(255,255,255,0.3);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #1d1d1f; cursor: pointer;
+  transition: transform 0.1s;
+  box-shadow: none; border: none;
 }
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
-input[type="range"]:active::-webkit-slider-thumb { background: #E8356D; }
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+input[type="range"]:active::-webkit-slider-thumb { transform: scale(0.95); }
 
+/* Dieter Rams style select — clean, minimal */
 select {
-  background: #fff; color: #1d1d1f; border: 1px solid #e0e0e0;
-  border-radius: 6px; padding: 4px 8px; font-size: 10px;
+  background: #fff; color: #1d1d1f; border: 1px solid #1d1d1f;
+  border-radius: 0; padding: 3px 6px; font-size: 9px;
   font-family: 'Inter', sans-serif; outline: none; cursor: pointer; transition: all 0.15s;
 }
-select:hover { border-color: #ccc; }
-select:focus { border-color: #1d1d1f; }
+select:hover { background: #f5f5f5; }
+select:focus { background: #f0f0f0; }
 
+/* Dieter Rams style toggles — black, minimal */
 .toggle-wrap { display: flex; align-items: center; gap: 8px; }
 .toggle {
-  position: relative; width: 36px; height: 20px;
-  background: #ddd; border-radius: 10px; cursor: pointer; transition: background 0.2s;
+  position: relative; width: 32px; height: 16px;
+  background: #e0e0e0; border-radius: 8px; cursor: pointer; transition: background 0.2s;
 }
-.toggle.on { background: #1A9E96; }
+.toggle.on { background: #1d1d1f; }
 .toggle-knob {
   position: absolute; top: 2px; left: 2px;
-  width: 16px; height: 16px; border-radius: 50%;
+  width: 12px; height: 12px; border-radius: 50%;
   background: #fff; transition: left 0.2s;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
-.toggle.on .toggle-knob { left: calc(100% - 18px); }
+.toggle.on .toggle-knob { left: calc(100% - 14px); }
 
-/* Action buttons row — Dieter Rams style black knobs */
-.act-row { display:flex; gap:6px; padding:12px 16px; justify-content:center; border-bottom:1px solid #f0f0f0; }
-.act-btn { width:34px; height:34px; padding:0; margin:0; border-radius:50%; background:#1d1d1f; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.2); transition:transform 0.15s; }
-.act-btn:hover { transform:scale(1.1); }
+/* Action buttons — white with colored icons */
+.act-row { display:flex; gap:5px; padding:10px 14px; justify-content:center; border-bottom:1px solid #f0f0f0; }
+.act-btn { width:30px; height:30px; padding:0; margin:0; border-radius:50%; background:#fff; border:1px solid #e0e0e0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.15s, border-color 0.15s; }
+.act-btn:hover { transform:scale(1.08); border-color:#ccc; }
 .act-btn:active { transform:scale(0.95); }
-.act-btn svg { width:16px; height:16px; stroke-width:1.8; fill:none; stroke:#fff; }
+.act-btn svg { width:14px; height:14px; stroke-width:1.8; fill:none; }
+#btnRegen svg { stroke:#E8356D; }
+#btnShuffle svg { stroke:#F47A20; }
+#btnRandom svg { stroke:#8B9A4A; }
+#btnPlay svg { stroke:#1A9E96; }
+#btnExport svg { stroke:#6B3FA0; }
+#btnRecent svg { stroke:#E57373; }
+#btnSound svg { stroke:#5DADE2; }
 
 /* Button states */
-#btnPlay.playing { background:#D42B3E; }
-#btnSound.muted { background:#999; }
+#btnPlay.playing svg { stroke:#D42B3E; }
+#btnSound.muted svg { stroke:#ccc; }
 
 /* Auto-play progress ring */
 .progress-ring {
@@ -626,9 +635,9 @@ select:focus { border-color: #1d1d1f; }
   }
 
   .section { padding: 12px 16px; }
-  .act-row { padding: 10px 8px; gap: 4px; }
-  .act-btn { width: 30px; height: 30px; }
-  .act-btn svg { width: 14px; height: 14px; }
+  .act-row { padding: 8px 10px; gap: 4px; }
+  .act-btn { width: 28px; height: 28px; }
+  .act-btn svg { width: 13px; height: 13px; }
 
 
   /* About modal mobile */
@@ -723,7 +732,7 @@ select:focus { border-color: #1d1d1f; }
   <div class="act-row">
     <div class="act-btn" id="btnRegen" title="New composition"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></div>
     <div class="act-btn" id="btnShuffle" title="Shuffle colors"><svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
-    <div class="act-btn" id="btnRandom" title="Random mix"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#fff" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#fff" stroke="none"/><circle cx="15.5" cy="15.5" r="1.5" fill="#fff" stroke="none"/><circle cx="15.5" cy="8.5" r="1.5" fill="#fff" stroke="none"/><circle cx="8.5" cy="15.5" r="1.5" fill="#fff" stroke="none"/></svg></div>
+    <div class="act-btn" id="btnRandom" title="Random mix"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="15.5" cy="15.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="15.5" cy="8.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="8.5" cy="15.5" r="1.5" fill="#8B9A4A" stroke="none"/></svg></div>
     <div class="act-btn" id="btnPlay" title="Auto-play"><svg viewBox="0 0 24 24" id="playIcon"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
     <div class="act-btn" id="btnExport" title="Export"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
     <div class="act-btn" id="btnRecent" title="Save to gallery"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
