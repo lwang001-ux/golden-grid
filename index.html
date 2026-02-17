@@ -51,7 +51,6 @@ body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica N
 .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
 .gallery-empty {
   font-size: 9px; color: #999; text-align: center; padding: 12px;
-  font-style: italic;
 }
 .gallery-clear {
   font-size: 8px; color: #bbb; cursor: pointer; text-align: right;
@@ -123,10 +122,12 @@ select:focus { border-color: #1d1d1f; }
   justify-content: center;
 }
 .action-btn {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 36px; height: 36px; min-width: 36px; min-height: 36px;
+  aspect-ratio: 1; border-radius: 50%;
   background: #fff; border: 1.5px solid #eee;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: all 0.15s; position: relative;
+  flex-shrink: 0;
 }
 .action-btn:hover { transform: scale(1.1); border-color: #ddd; }
 .action-btn:active { transform: scale(0.92); }
@@ -140,6 +141,7 @@ select:focus { border-color: #1d1d1f; }
 #btnPlay svg { stroke: #1A9E96; }
 #btnPlay.playing svg { stroke: #D42B3E; }
 #btnExport svg { stroke: #6B3FA0; }
+#btnRecent svg { stroke: #E8707A; }
 #btnSound svg { stroke: #2E5BA8; }
 #btnSound.muted { border-color: #ddd; }
 #btnSound.muted svg { stroke: #ccc; }
@@ -764,7 +766,11 @@ select:focus { border-color: #1d1d1f; }
     </div>
     <div class="action-btn" id="btnExport" title="Export wallpaper">
       <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span class="tooltip">Save</span>
+      <span class="tooltip">Export</span>
+    </div>
+    <div class="action-btn" id="btnRecent" title="Save to recent">
+      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <span class="tooltip">Recent</span>
     </div>
     <div class="action-btn" id="btnSound" title="Toggle sound">
       <svg viewBox="0 0 24 24" id="soundIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
@@ -2400,7 +2406,7 @@ new p5(function(p) {
   };
 
   p.keyPressed = function() {
-    if (p.key === ' ') { playRegenerate(); generateGrid(p); setTimeout(() => addToGallery(p), 100); return false; }
+    if (p.key === ' ') { playRegenerate(); generateGrid(p); return false; }
     if (p.key === 's' || p.key === 'S') { playSave(); p.saveCanvas('lesa-golden-grid', 'png'); return false; }
     if (p.key === 'r' || p.key === 'R') { document.getElementById('btnRandom').click(); return false; }
     if (p.key === 'p' || p.key === 'P') {
@@ -2434,7 +2440,6 @@ new p5(function(p) {
   document.getElementById('btnRegen').addEventListener('click', () => {
     playRegenerate();
     generateGrid(p);
-    setTimeout(() => addToGallery(p), 100); // Capture after render
   });
   document.getElementById('btnShuffle').addEventListener('click', () => { playShuffle(); shuffleColors(); });
 
@@ -2475,6 +2480,10 @@ new p5(function(p) {
   document.getElementById('btnExport').addEventListener('click', () => {
     playExport();
     document.getElementById('exportModal').classList.add('show');
+  });
+  document.getElementById('btnRecent').addEventListener('click', () => {
+    addToGallery(p);
+    playClick();
   });
   document.getElementById('modalClose').addEventListener('click', () => {
     document.getElementById('exportModal').classList.remove('show');
