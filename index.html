@@ -1255,10 +1255,9 @@ function addToGallery(p) {
   const item = {
     thumb: dataUrl,
     palette: currentPal,
-    colors: [...currentColors],
+    colors: [...PALETTES[currentPal].colors],
     settings: {
       depth: document.getElementById('depth').value,
-      direction: document.getElementById('direction').value,
       gap: document.getElementById('gap').value,
       radius: document.getElementById('radius').value,
       layout: document.getElementById('layout').value,
@@ -1307,8 +1306,8 @@ function restoreFromGallery(index) {
   document.getElementById('radiusV').textContent = item.settings.radius;
 
   // Restore colors
-  currentColors = [...item.colors];
   currentPal = item.palette;
+  PALETTES[currentPal].colors = [...item.colors];
   buildPalUI();
 }
 
