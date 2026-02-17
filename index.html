@@ -3829,13 +3829,22 @@ document.addEventListener('DOMContentLoaded', function() {
         colors: PALETTES[currentPal].colors.slice(),
         shape: document.getElementById('shape').value,
         layout: document.getElementById('layout').value,
-        depth: document.getElementById('depth').value
+        depth: document.getElementById('depth').value,
+        cols: document.getElementById('cols').value
       });
       document.getElementById('btnUndo').classList.add('has-history');
+      // Randomize palette
+      currentPal = Math.floor(Math.random() * PALETTES.length);
+      buildPalUI();
       shuffleColors();
-      document.getElementById('shape').value = ['rect','circle','diamond','parallelogram','hexagon','mixed'][Math.floor(Math.random()*6)];
-      document.getElementById('layout').value = ['grid','fibonacci-grid','radial'][Math.floor(Math.random()*3)];
-      document.getElementById('depth').value = Math.floor(Math.random()*5)+2;
+      // Use safe values only
+      var isMobile = window.innerWidth <= 768;
+      var validCols = isMobile ? [3, 4, 5] : [3, 4, 5, 6, 8];
+      var validDepths = isMobile ? [2, 3, 4] : [2, 3, 4, 5];
+      document.getElementById('shape').value = ['rect','circle','diamond','mixed'][Math.floor(Math.random()*4)];
+      document.getElementById('layout').value = 'grid';  // Always use grid for reliability
+      document.getElementById('depth').value = validDepths[Math.floor(Math.random()*validDepths.length)];
+      document.getElementById('cols').value = validCols[Math.floor(Math.random()*validCols.length)];
       if (p5Instance) { generateGrid(p5Instance); }
     };
     document.getElementById('btnUndo').onclick = function() {
