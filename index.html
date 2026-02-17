@@ -39,6 +39,26 @@ body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica N
   color: #444; margin-bottom: 10px;
 }
 
+/* Gallery - recent generations */
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+}
+.gallery-item {
+  aspect-ratio: 1; border-radius: 6px; overflow: hidden;
+  cursor: pointer; transition: all 0.15s; border: 2px solid transparent;
+}
+.gallery-item:hover { transform: scale(1.05); border-color: #9B8FD4; }
+.gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+.gallery-empty {
+  font-size: 9px; color: #999; text-align: center; padding: 12px;
+  font-style: italic;
+}
+.gallery-clear {
+  font-size: 8px; color: #bbb; cursor: pointer; text-align: right;
+  margin-top: 6px; transition: color 0.15s;
+}
+.gallery-clear:hover { color: #666; }
+
 .pal-option {
   display: flex; align-items: center; gap: 10px;
   padding: 6px 8px; margin-bottom: 2px; cursor: pointer; transition: all 0.2s;
@@ -519,12 +539,17 @@ select:focus { border-color: #1d1d1f; }
 }
 .welcome-start {
   display: block; width: 100%; margin-top: 16px; padding: 14px;
-  background: #1d1d1f; color: #fff; border: none; border-radius: 10px;
+  background: #9B8FD4; color: #fff; border: none; border-radius: 10px;
   font-size: 12px; font-weight: 500; letter-spacing: 0.3px;
   cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif;
 }
-.welcome-start:hover { background: #333; transform: scale(1.01); }
+.welcome-start:hover { background: #8A7EC8; transform: scale(1.01); }
 .welcome-start:active { transform: scale(0.98); }
+.welcome-footer {
+  margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee;
+  text-align: center; font-size: 9px; color: #999; letter-spacing: 0.3px;
+}
+.welcome-footer .heart { color: #E8707A; }
 
 /* ==========================================
    MOBILE & TABLET RESPONSIVE
@@ -892,6 +917,15 @@ select:focus { border-color: #1d1d1f; }
     </div>
   </div>
 
+  <!-- GALLERY - Recent Generations -->
+  <div class="section" id="gallerySection">
+    <div class="section-label">Recent</div>
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="gallery-empty">Generations will appear here</div>
+    </div>
+    <div class="gallery-clear" id="galleryClear">clear all</div>
+  </div>
+
   <!-- AMBIENT MUSIC PLAYER — Desktop only -->
   <div id="ramsPlayer" style="padding:16px 12px 12px; text-align:center;">
     <div id="ramsSpeaker" style="width:80px; height:80px; margin:0 auto; border-radius:50%; border:2px solid #ddd; background:#f9f9f9; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; position:relative;">
@@ -984,6 +1018,9 @@ select:focus { border-color: #1d1d1f; }
   <div class="welcome-card">
     <h2>Golden Grid</h2>
     <div class="welcome-sub">Your colors in perfect ratio</div>
+    <p style="font-size: 11px; color: #666; line-height: 1.6; margin-bottom: 20px;">
+      A generative art tool that transforms your color palettes into beautiful compositions using the golden ratio. Upload any image to extract its colors, then watch as the algorithm creates endless variations of balanced, harmonious designs.
+    </p>
 
     <h3>Quick Start</h3>
     <div class="welcome-steps">
@@ -1035,6 +1072,10 @@ select:focus { border-color: #1d1d1f; }
     </div>
 
     <button class="welcome-start" id="welcomeStart">Get Started</button>
+
+    <div class="welcome-footer">
+      made with <span class="heart">♥</span> p5.js and claude code
+    </div>
   </div>
 </div>
 
@@ -1177,6 +1218,105 @@ function saveUserPalettes() {
     const userPals = PALETTES.filter(p => p.userCreated);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userPals));
   } catch(e) { console.warn('Failed to save palettes', e); }
+}
+
+// =============================================
+// GALLERY — Recent generations
+// =============================================
+const GALLERY_KEY = 'golden-grid-gallery';
+const MAX_GALLERY = 8;
+let galleryItems = [];
+
+function loadGallery() {
+  try {
+    const saved = localStorage.getItem(GALLERY_KEY);
+    if (saved) galleryItems = JSON.parse(saved);
+  } catch(e) { galleryItems = []; }
+}
+
+function saveGallery() {
+  try {
+    localStorage.setItem(GALLERY_KEY, JSON.stringify(galleryItems));
+  } catch(e) { console.warn('Failed to save gallery', e); }
+}
+
+function addToGallery(p) {
+  // Capture current canvas as thumbnail
+  const canvas = document.querySelector('canvas');
+  if (!canvas) return;
+
+  // Create small thumbnail
+  const thumb = document.createElement('canvas');
+  thumb.width = 100; thumb.height = 100;
+  const ctx = thumb.getContext('2d');
+  ctx.drawImage(canvas, 0, 0, 100, 100);
+  const dataUrl = thumb.toDataURL('image/jpeg', 0.7);
+
+  // Store with current settings
+  const item = {
+    thumb: dataUrl,
+    palette: currentPal,
+    colors: [...currentColors],
+    settings: {
+      depth: document.getElementById('depth').value,
+      direction: document.getElementById('direction').value,
+      gap: document.getElementById('gap').value,
+      radius: document.getElementById('radius').value,
+      layout: document.getElementById('layout').value,
+      shape: document.getElementById('shape').value
+    },
+    timestamp: Date.now()
+  };
+
+  // Add to beginning, limit to MAX_GALLERY
+  galleryItems.unshift(item);
+  if (galleryItems.length > MAX_GALLERY) galleryItems.pop();
+
+  saveGallery();
+  renderGallery();
+}
+
+function renderGallery() {
+  const grid = document.getElementById('galleryGrid');
+  if (!grid) return;
+
+  if (galleryItems.length === 0) {
+    grid.innerHTML = '<div class="gallery-empty">Generations will appear here</div>';
+    return;
+  }
+
+  grid.innerHTML = galleryItems.map((item, i) =>
+    `<div class="gallery-item" data-index="${i}"><img src="${item.thumb}" alt="Generation ${i + 1}"></div>`
+  ).join('');
+}
+
+function restoreFromGallery(index) {
+  const item = galleryItems[index];
+  if (!item) return;
+
+  // Restore settings
+  document.getElementById('depth').value = item.settings.depth;
+  document.getElementById('direction').value = item.settings.direction;
+  document.getElementById('gap').value = item.settings.gap;
+  document.getElementById('radius').value = item.settings.radius;
+  document.getElementById('layout').value = item.settings.layout;
+  document.getElementById('shape').value = item.settings.shape;
+
+  // Update value displays
+  document.getElementById('depthV').textContent = item.settings.depth;
+  document.getElementById('gapV').textContent = item.settings.gap;
+  document.getElementById('radiusV').textContent = item.settings.radius;
+
+  // Restore colors
+  currentColors = [...item.colors];
+  currentPal = item.palette;
+  buildPalUI();
+}
+
+function clearGallery() {
+  galleryItems = [];
+  saveGallery();
+  renderGallery();
 }
 
 // =============================================
@@ -2204,7 +2344,9 @@ new p5(function(p) {
     p.createCanvas(w, h);
     p.colorMode(p.RGB, 255);
     loadUserPalettes(); // Load saved user palettes from localStorage
+    loadGallery(); // Load saved gallery from localStorage
     buildPalUI();
+    renderGallery();
     generateGrid(p);
   };
 
@@ -2245,7 +2387,7 @@ new p5(function(p) {
   };
 
   p.keyPressed = function() {
-    if (p.key === ' ') { playRegenerate(); generateGrid(p); return false; }
+    if (p.key === ' ') { playRegenerate(); generateGrid(p); setTimeout(() => addToGallery(p), 100); return false; }
     if (p.key === 's' || p.key === 'S') { playSave(); p.saveCanvas('lesa-golden-grid', 'png'); return false; }
     if (p.key === 'r' || p.key === 'R') { document.getElementById('btnRandom').click(); return false; }
     if (p.key === 'p' || p.key === 'P') {
@@ -2276,7 +2418,11 @@ new p5(function(p) {
   };
 
   // Wire action buttons
-  document.getElementById('btnRegen').addEventListener('click', () => { playRegenerate(); generateGrid(p); });
+  document.getElementById('btnRegen').addEventListener('click', () => {
+    playRegenerate();
+    generateGrid(p);
+    setTimeout(() => addToGallery(p), 100); // Capture after render
+  });
   document.getElementById('btnShuffle').addEventListener('click', () => { playShuffle(); shuffleColors(); });
 
   // Random Mix - randomize everything
@@ -2345,6 +2491,21 @@ new p5(function(p) {
     document.getElementById('exportModal').classList.remove('show');
     playSave();
     p.saveCanvas('golden-grid-current', 'png');
+  });
+
+  // Gallery event handlers
+  document.getElementById('galleryGrid').addEventListener('click', (e) => {
+    const item = e.target.closest('.gallery-item');
+    if (item) {
+      const index = parseInt(item.dataset.index);
+      restoreFromGallery(index);
+      generateGrid(p);
+      playClick();
+    }
+  });
+  document.getElementById('galleryClear').addEventListener('click', () => {
+    clearGallery();
+    playClick();
   });
 
   document.getElementById('btnSound').addEventListener('click', () => {
@@ -2527,7 +2688,7 @@ new p5(function(p) {
       reader.onload = function(ev) {
         const img = new Image();
         img.onload = function() {
-          const colors = extractColorsFromImage(img, 10);
+          const colors = extractColorsFromImage(img, 5);
           if (colors.length >= 3) {
             // Create thumbnail (48x48)
             const thumbCanvas = document.createElement('canvas');
