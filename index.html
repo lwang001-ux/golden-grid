@@ -2714,38 +2714,88 @@ new p5(function(p) {
   });
 
   // =============================================
-  // AMBIENT MUSIC PLAYER — Happy generative music
-  // Gentle arpeggios, warm pads, major keys
+  // AMBIENT MUSIC PLAYER — Multiple moods to shuffle
+  // Click to shuffle between different ambient styles
   // =============================================
   let ramsPlaying = false;
   let ramsInterval = null;
   let ramsPad = null;
-  const ramsTitles = [
-    'Golden Morning', 'Sunlit Grid', 'Phi Garden',
-    'Warm Ratio', 'Gentle Subdivide', 'Soft Fibonacci',
-    'Daylight Haze', 'Happy Module', 'Bright Section',
-    'Calm Pattern', 'Peaceful Grid', 'Light Drift'
+  let currentMood = 0;
+
+  const ramsMoods = [
+    {
+      name: 'Sunny Morning',
+      scale: [261.6, 293.7, 329.6, 392.0, 440.0, 523.3, 587.3, 659.3],
+      padFreqs: [196.0, 293.7],
+      tempo: 900,
+      decay: 1.5,
+      color: '#F4A020'
+    },
+    {
+      name: 'Dreamy Clouds',
+      scale: [523.3, 587.3, 659.3, 784.0, 880.0, 1047],
+      padFreqs: [261.6, 392.0],
+      tempo: 1200,
+      decay: 2.5,
+      color: '#9B8FD4'
+    },
+    {
+      name: 'Cozy Evening',
+      scale: [196.0, 220.0, 261.6, 293.7, 329.6, 392.0],
+      padFreqs: [130.8, 196.0],
+      tempo: 1100,
+      decay: 2.0,
+      color: '#E8707A'
+    },
+    {
+      name: 'Playful Garden',
+      scale: [329.6, 392.0, 440.0, 523.3, 587.3, 659.3, 784.0],
+      padFreqs: [220.0, 329.6],
+      tempo: 500,
+      decay: 0.8,
+      color: '#8B9A4A'
+    },
+    {
+      name: 'Ocean Calm',
+      scale: [220.0, 261.6, 329.6, 392.0, 440.0],
+      padFreqs: [110.0, 164.8],
+      tempo: 1800,
+      decay: 3.0,
+      color: '#4A9A9A'
+    },
+    {
+      name: 'Golden Hour',
+      scale: [293.7, 329.6, 392.0, 440.0, 523.3, 587.3],
+      padFreqs: [174.6, 261.6],
+      tempo: 1000,
+      decay: 1.8,
+      color: '#E8A040'
+    }
   ];
 
   function ramsGenerateAmbient() {
     ensureAudio();
     const t = audioCtx.currentTime;
+    const mood = ramsMoods[currentMood];
 
-    // Major pentatonic scale notes (happy, no dissonance)
-    const scale = [261.6, 293.7, 329.6, 392.0, 440.0, 523.3, 587.3, 659.3, 784.0];
+    // Update ring color to match mood
+    const rings = document.getElementById('ramsRings');
+    rings.querySelectorAll('circle').forEach((c, i) => {
+      if (i < 3) c.setAttribute('stroke', mood.color);
+      else c.setAttribute('fill', mood.color);
+    });
 
-    // Soft warm pad (two notes a fifth apart)
-    const padFreqs = [196.0, 293.7]; // G3 and D4 - warm fifth
-    ramsPad = padFreqs.map(freq => {
+    // Soft warm pad
+    ramsPad = mood.padFreqs.map(freq => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       const filter = audioCtx.createBiquadFilter();
       osc.type = 'sine';
       osc.frequency.value = freq;
       filter.type = 'lowpass';
-      filter.frequency.value = 800;
+      filter.frequency.value = 600;
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.04, t + 2);
+      gain.gain.linearRampToValueAtTime(0.035, t + 2);
       osc.connect(filter);
       filter.connect(gain);
       gain.connect(compressor);
@@ -2753,13 +2803,12 @@ new p5(function(p) {
       return { osc, gain };
     });
 
-    // Gentle random arpeggios
+    // Arpeggios based on mood
     ramsInterval = setInterval(() => {
       if (!ramsPlaying) return;
       const now = audioCtx.currentTime;
-      const note = scale[Math.floor(Math.random() * scale.length)];
+      const note = mood.scale[Math.floor(Math.random() * mood.scale.length)];
 
-      // Bell-like tone
       const osc = audioCtx.createOscillator();
       const osc2 = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -2767,10 +2816,10 @@ new p5(function(p) {
       osc.type = 'sine';
       osc.frequency.value = note;
       osc2.type = 'sine';
-      osc2.frequency.value = note * 2; // octave above, quieter
+      osc2.frequency.value = note * 2;
 
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+      gain.gain.setValueAtTime(0.055, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + mood.decay);
 
       osc.connect(gain);
       osc2.connect(gain);
@@ -2778,13 +2827,11 @@ new p5(function(p) {
 
       osc.start(now);
       osc2.start(now);
-      osc.stop(now + 1.6);
-      osc2.stop(now + 1.6);
-    }, 800 + Math.random() * 600);
+      osc.stop(now + mood.decay + 0.1);
+      osc2.stop(now + mood.decay + 0.1);
+    }, mood.tempo + Math.random() * (mood.tempo * 0.3));
 
-    // Pick a title
-    const titleIndex = Math.floor(Math.random() * ramsTitles.length);
-    document.getElementById('ramsSongTitle').textContent = ramsTitles[titleIndex];
+    document.getElementById('ramsSongTitle').textContent = mood.name;
   }
 
   function ramsStopAmbient() {
@@ -2803,18 +2850,32 @@ new p5(function(p) {
   }
 
   document.getElementById('ramsSpeaker').addEventListener('click', () => {
-    ramsPlaying = !ramsPlaying;
     const speaker = document.getElementById('ramsSpeaker');
     const rings = document.getElementById('ramsRings');
+
     if (ramsPlaying) {
+      // If playing, shuffle to next mood
+      ramsStopAmbient();
+      currentMood = (currentMood + 1) % ramsMoods.length;
+      setTimeout(() => ramsGenerateAmbient(), 200);
+    } else {
+      // Start playing
+      ramsPlaying = true;
       speaker.classList.add('playing');
       rings.style.opacity = '1';
+      currentMood = Math.floor(Math.random() * ramsMoods.length);
       ramsGenerateAmbient();
-    } else {
-      speaker.classList.remove('playing');
-      rings.style.opacity = '0';
-      ramsStopAmbient();
     }
+  });
+
+  // Double-click to stop
+  document.getElementById('ramsSpeaker').addEventListener('dblclick', () => {
+    ramsPlaying = false;
+    const speaker = document.getElementById('ramsSpeaker');
+    const rings = document.getElementById('ramsRings');
+    speaker.classList.remove('playing');
+    rings.style.opacity = '0';
+    ramsStopAmbient();
   });
 
 }, document.body);
