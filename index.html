@@ -440,19 +440,17 @@ select:focus { border-color: #1d1d1f; }
   max-width: 440px; width: 90%; box-shadow: 0 12px 48px rgba(0,0,0,0.12);
   border: 1px solid #eee; max-height: 85vh; overflow-y: auto;
 }
-.about-card::-webkit-scrollbar { width: 5px; }
+.about-card::-webkit-scrollbar { width: 6px; }
 .about-card::-webkit-scrollbar-track { background: transparent; margin: 24px 0; }
 .about-card::-webkit-scrollbar-thumb {
   background: repeating-linear-gradient(
-    0deg,
+    180deg,
     #E84858 0px,
-    #E84858 1px,
-    transparent 1px,
-    transparent 3px
+    #E84858 2px,
+    transparent 2px,
+    transparent 5px
   );
-  border-radius: 3px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
+  border-radius: 0;
 }
 .about-card h2 {
   font-size: 18px; font-weight: 600; color: #1d1d1f;
@@ -979,11 +977,11 @@ select:focus { border-color: #1d1d1f; }
     scrollbar-color: #E84858 transparent;
   }
   /* Red striped scrollbar for mobile */
-  .about-card::-webkit-scrollbar, .welcome-card::-webkit-scrollbar { width: 5px !important; }
+  .about-card::-webkit-scrollbar, .welcome-card::-webkit-scrollbar { width: 6px !important; }
   .about-card::-webkit-scrollbar-track, .welcome-card::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0; }
   .about-card::-webkit-scrollbar-thumb, .welcome-card::-webkit-scrollbar-thumb {
-    background: repeating-linear-gradient(0deg, #E84858 0px, #E84858 1px, transparent 1px, transparent 3px) !important;
-    border-radius: 3px !important;
+    background: repeating-linear-gradient(180deg, #E84858 0px, #E84858 2px, transparent 2px, transparent 5px) !important;
+    border-radius: 0 !important;
   }
 }
 </style>
