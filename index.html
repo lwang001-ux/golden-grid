@@ -15,13 +15,13 @@ body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica N
    CLEAN PANEL — Dieter Rams / Apple Store
    ========================================== */
 #panel {
-  position: fixed; top: 0; right: 0; width: 260px; height: 100vh;
+  position: fixed; top: 0; right: 0; width: 320px; height: 100vh;
   background: #fafafa; border-left: 1px solid #eee;
   padding: 0; z-index: 100; overflow-y: auto;
   display: flex; flex-direction: column;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-#panel.hidden { transform: translateX(260px); }
+#panel.hidden { transform: translateX(320px); }
 #panel::-webkit-scrollbar { width: 3px; }
 #panel::-webkit-scrollbar-track { background: transparent; }
 #panel::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
@@ -85,13 +85,13 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
   width: 12px; height: 12px; border-radius: 50%;
-  background: #2d2d2d; cursor: pointer;
+  background: #F47A20; cursor: pointer;
   transition: transform 0.1s, box-shadow 0.15s;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.12);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
 }
 input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
-input[type="range"]:active::-webkit-slider-thumb { background: #1d1d1f; }
+input[type="range"]:active::-webkit-slider-thumb { background: #E8356D; }
 
 select {
   background: #fff; color: #1d1d1f; border: 1px solid #e0e0e0;
@@ -106,7 +106,7 @@ select:focus { border-color: #1d1d1f; }
   position: relative; width: 36px; height: 20px;
   background: #ddd; border-radius: 10px; cursor: pointer; transition: background 0.2s;
 }
-.toggle.on { background: #1d1d1f; }
+.toggle.on { background: #1A9E96; }
 .toggle-knob {
   position: absolute; top: 2px; left: 2px;
   width: 16px; height: 16px; border-radius: 50%;
@@ -115,52 +115,22 @@ select:focus { border-color: #1d1d1f; }
 }
 .toggle.on .toggle-knob { left: calc(100% - 18px); }
 
-/* Action buttons — clean, one row, flat color */
-.actions {
-  padding: 14px 20px; display: flex; gap: 8px; flex-wrap: nowrap;
-  border-bottom: 1px solid #f0f0f0;
-  justify-content: center;
-}
-.action-btn {
-  width: 36px; height: 36px; min-width: 36px; min-height: 36px;
-  aspect-ratio: 1; border-radius: 50%;
-  background: #fff; border: 1.5px solid #eee;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.15s; position: relative;
-  flex-shrink: 0;
-}
-.action-btn:hover { transform: scale(1.1); border-color: #ddd; }
-.action-btn:active { transform: scale(0.92); }
-.action-btn svg { width: 15px; height: 15px; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+/* Action buttons row */
+.act-row { display:flex; gap:1px; padding:5px 6px; justify-content:center; border-bottom:1px solid #f0f0f0; }
+.act-btn { width:20px; height:20px; padding:0; margin:0; border-radius:50%; background:#fff; border:1px solid #ddd; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:none; }
+.act-btn:hover { transform:scale(1.08); border-color:#bbb; }
+.act-btn svg { width:10px; height:10px; stroke-width:2; fill:none; }
 
-/* Each button — white bg, colored symbol */
-#btnRegen svg { stroke: #E8356D; }
-#btnShuffle svg { stroke: #F47A20; }
-#btnRandom svg { stroke: #8B9A4A; fill: none; }
-#btnRandom svg circle { fill: #8B9A4A; stroke: none; }
-#btnPlay svg { stroke: #1A9E96; }
+/* Button states */
 #btnPlay.playing svg { stroke: #D42B3E; }
-#btnExport svg { stroke: #6B3FA0; }
-#btnRecent svg { stroke: #E8707A; }
-#btnSound svg { stroke: #2E5BA8; }
-#btnSound.muted { border-color: #ddd; }
 #btnSound.muted svg { stroke: #ccc; }
-
-.action-btn .tooltip {
-  position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
-  font-size: 7px; color: #bbb; letter-spacing: 0.5px; text-transform: uppercase;
-  white-space: nowrap; opacity: 0; transition: opacity 0.15s; pointer-events: none;
-}
-.action-btn:hover .tooltip { opacity: 1; }
 
 /* Auto-play progress ring */
 .progress-ring {
-  position: absolute; top: -3px; left: -3px;
-  width: 42px; height: 42px; pointer-events: none;
+  position: absolute; top: -2px; left: -2px;
+  width: 16px; height: 16px; pointer-events: none;
 }
-.progress-ring circle {
-  display: none;
-}
+.progress-ring circle { display: none; }
 
 /* Dieter Rams speaker */
 #ramsSpeaker:hover { border-color: #ccc; box-shadow: 0 0 0 4px rgba(0,0,0,0.03); }
@@ -175,30 +145,31 @@ select:focus { border-color: #1d1d1f; }
 }
 #exportModal.show { display: flex; }
 .modal-card {
-  background: #fff; border-radius: 16px; padding: 28px 28px;
-  max-width: 340px; width: 90%; box-shadow: 0 8px 40px rgba(0,0,0,0.12);
-  border: 1px solid #eee;
+  background: #fff; border-radius: 16px; padding: 24px;
+  max-width: 320px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
 }
 .modal-card h2 { font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 4px; }
 .modal-card .modal-sub { font-size: 10px; color: #444; margin-bottom: 20px; }
 .export-option {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px; margin-bottom: 6px;
-  background: #fafafa; border: 1px solid #eee; border-radius: 10px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; margin-bottom: 4px;
+  background: #fff; border: 1px solid #f0f0f0; border-radius: 8px;
   cursor: pointer; transition: all 0.15s;
 }
-.export-option:hover { border-color: #1d1d1f; }
+.export-option:hover { border-color: #ddd; background: #fafafa; }
 .export-option .exp-icon {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 28px; height: 28px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  background: transparent;
 }
-#expDesktop .exp-icon { background: #6B3FA0; }
-#expPhone .exp-icon { background: #E8356D; }
-#expSquare .exp-icon { background: #F47A20; }
-#expPrint .exp-icon { background: #8B9A4A; }
-#expVideo .exp-icon { background: #1A9E96; }
-#expCurrent .exp-icon { background: #2E5BA8; }
-.export-option .exp-icon svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#expDesktop .exp-icon svg { stroke: #6B3FA0; }
+#expPhone .exp-icon svg { stroke: #E8356D; }
+#expSquare .exp-icon svg { stroke: #F47A20; }
+#expPrint .exp-icon svg { stroke: #8B9A4A; }
+#expVideo .exp-icon svg { stroke: #1A9E96; }
+#expCurrent .exp-icon svg { stroke: #2E5BA8; }
+.export-option .exp-icon svg { width: 18px; height: 18px; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .export-option .exp-text h3 { font-size: 11px; font-weight: 500; color: #1d1d1f; margin-bottom: 1px; }
 .export-option .exp-text p { font-size: 9px; color: #444; }
 .modal-close {
@@ -224,7 +195,7 @@ select:focus { border-color: #1d1d1f; }
 
 /* Panel toggle button — clean minimal */
 #panelToggle {
-  position: fixed; top: 50%; right: 260px; transform: translateY(-50%);
+  position: fixed; top: 50%; right: 320px; transform: translateY(-50%);
   width: 24px; height: 48px; z-index: 150;
   background: #fafafa; border: 1px solid #eee;
   border-right: none; border-radius: 6px 0 0 6px;
@@ -396,13 +367,14 @@ select:focus { border-color: #1d1d1f; }
 .about-card .phi-item:hover { transform: scale(1.03); }
 .about-card .phi-item .phi-tooltip {
   position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
-  background: #1d1d1f; color: #fff; font-size: 9px; padding: 8px 12px;
+  background: #fff; color: #E8707A; font-size: 9px; padding: 8px 12px;
   border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none;
-  transition: opacity 0.15s; z-index: 10; font-weight: 400; letter-spacing: 0.2px;
+  transition: opacity 0.15s; z-index: 10; font-weight: 500; letter-spacing: 0.2px;
+  border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 .about-card .phi-item .phi-tooltip::after {
   content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-  border: 5px solid transparent; border-top-color: #1d1d1f;
+  border: 5px solid transparent; border-top-color: #fff;
 }
 .about-card .phi-item:hover .phi-tooltip { opacity: 1; }
 .about-card .uses {
@@ -506,13 +478,14 @@ select:focus { border-color: #1d1d1f; }
   display: flex; align-items: flex-start; gap: 12px;
 }
 .step-num {
-  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 600; color: #fff;
+  font-size: 11px; font-weight: 600; background: transparent;
+  border: 1.5px solid currentColor;
 }
-.step-num.s1 { background: #E8356D; }
-.step-num.s2 { background: #F47A20; }
-.step-num.s3 { background: #6B3FA0; }
+.step-num.s1 { color: #E8356D; }
+.step-num.s2 { color: #F47A20; }
+.step-num.s3 { color: #6B3FA0; }
 .step-text {
   font-size: 12px; color: #444; line-height: 1.5; padding-top: 2px;
 }
@@ -521,8 +494,8 @@ select:focus { border-color: #1d1d1f; }
   display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
 }
 .control-item {
-  background: #fafafa; border: 1px solid #eee; border-radius: 8px;
-  padding: 10px 12px; display: flex; align-items: flex-start; gap: 10px;
+  background: #fff; border: 1px solid #f0f0f0; border-radius: 8px;
+  padding: 8px 10px; display: flex; align-items: flex-start; gap: 8px;
 }
 .control-item .ctrl-icon {
   width: 20px; height: 20px; flex-shrink: 0;
@@ -555,11 +528,11 @@ select:focus { border-color: #1d1d1f; }
 }
 .welcome-start {
   display: block; width: 100%; margin-top: 16px; padding: 12px;
-  background: #faf8f5; color: #2E5BA8; border: 1.5px solid #2E5BA8; border-radius: 10px;
+  background: #fff; color: #1A9E96; border: 1.5px solid #1A9E96; border-radius: 10px;
   font-size: 12px; font-weight: 500; letter-spacing: 0.3px;
   cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif;
 }
-.welcome-start:hover { background: #2E5BA8; color: #fff; }
+.welcome-start:hover { background: #f0faf9; border-color: #159085; color: #159085; }
 .welcome-start:active { transform: scale(0.98); }
 .welcome-footer {
   margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee;
@@ -652,8 +625,9 @@ select:focus { border-color: #1d1d1f; }
   }
 
   .section { padding: 12px 16px; }
-  .actions { padding: 12px 16px; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .action-btn { width: 44px; height: 44px; }
+  .act-row { padding: 5px 6px; gap: 2px; }
+  .act-btn { width: 18px; height: 18px; }
+  .act-btn svg { width: 9px; height: 9px; }
 
 
   /* About modal mobile */
@@ -710,7 +684,6 @@ select:focus { border-color: #1d1d1f; }
 
 /* Touch-friendly improvements */
 @media (hover: none) and (pointer: coarse) {
-  .action-btn { min-width: 44px; min-height: 44px; }
   .pal-option { min-height: 44px; }
   .toggle { min-width: 44px; }
   .phi-item { min-height: 44px; padding: 12px; }
@@ -745,37 +718,14 @@ select:focus { border-color: #1d1d1f; }
 
   <div class="section" id="palSection"></div>
 
-  <!-- ACTIONS — all 5 buttons in one compact row -->
-  <div class="actions">
-    <div class="action-btn" id="btnRegen" title="New composition">
-      <svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
-      <span class="tooltip">New</span>
-    </div>
-    <div class="action-btn" id="btnShuffle" title="Shuffle colors">
-      <svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-      <span class="tooltip">Shuffle</span>
-    </div>
-    <div class="action-btn" id="btnRandom" title="Random mix">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/></svg>
-      <span class="tooltip">Random</span>
-    </div>
-    <div class="action-btn" id="btnPlay" title="Auto-play">
-      <svg viewBox="0 0 24 24" id="playIcon"><polygon points="6 3 20 12 6 21 6 3" fill="none"/></svg>
-      <svg class="progress-ring" id="progressRing"><circle cx="22" cy="22" r="20"/></svg>
-      <span class="tooltip">Play</span>
-    </div>
-    <div class="action-btn" id="btnExport" title="Export wallpaper">
-      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span class="tooltip">Export</span>
-    </div>
-    <div class="action-btn" id="btnRecent" title="Save to recent">
-      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-      <span class="tooltip">Recent</span>
-    </div>
-    <div class="action-btn" id="btnSound" title="Toggle sound">
-      <svg viewBox="0 0 24 24" id="soundIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-      <span class="tooltip">Sound</span>
-    </div>
+  <!-- ACTIONS — 6 buttons -->
+  <div class="act-row">
+    <div class="act-btn" id="btnRegen" title="New"><svg viewBox="0 0 24 24" style="stroke:#E8356D"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></div>
+    <div class="act-btn" id="btnShuffle" title="Shuffle"><svg viewBox="0 0 24 24" style="stroke:#F47A20"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
+    <div class="act-btn" id="btnPlay" title="Play"><svg viewBox="0 0 24 24" id="playIcon" style="stroke:#1A9E96"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
+    <div class="act-btn" id="btnExport" title="Export"><svg viewBox="0 0 24 24" style="stroke:#9B59B6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+    <div class="act-btn" id="btnRecent" title="Save"><svg viewBox="0 0 24 24" style="stroke:#E57373"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+    <div class="act-btn" id="btnSound" title="Sound"><svg viewBox="0 0 24 24" id="soundIcon" style="stroke:#5DADE2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
   </div>
 
   <!-- AUTO-PLAY SETTINGS -->
@@ -975,7 +925,8 @@ select:focus { border-color: #1d1d1f; }
       </svg>
     </div>
     <div style="margin-top:8px; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:#bbb; font-family:'SF Mono',SFMono-Regular,Menlo,monospace;">Ambient</div>
-    <div id="ramsSongTitle" style="margin-top:3px; font-size:9px; color:#888; min-height:12px;"></div>
+    <div id="ramsSongTitle" style="margin-top:3px; font-size:9px; color:#888; min-height:12px;">click to play</div>
+    <div style="margin-top:2px; font-size:7px; color:#bbb;">double-click to shuffle moods</div>
   </div>
 
   <div id="hints">
@@ -2408,7 +2359,7 @@ new p5(function(p) {
   p.keyPressed = function() {
     if (p.key === ' ') { playRegenerate(); generateGrid(p); return false; }
     if (p.key === 's' || p.key === 'S') { playSave(); p.saveCanvas('lesa-golden-grid', 'png'); return false; }
-    if (p.key === 'r' || p.key === 'R') { document.getElementById('btnRandom').click(); return false; }
+    if (p.key === 'r' || p.key === 'R') { document.getElementById('btnShuffle').click(); return false; }
     if (p.key === 'p' || p.key === 'P') {
       if (autoPlaying) stopAutoPlay(); else startAutoPlay(p);
       return false;
@@ -2441,36 +2392,29 @@ new p5(function(p) {
     playRegenerate();
     generateGrid(p);
   });
-  document.getElementById('btnShuffle').addEventListener('click', () => { playShuffle(); shuffleColors(); });
-
-  // Random Mix - randomize everything
-  document.getElementById('btnRandom').addEventListener('click', () => {
-    // Shuffle colors within current palette
-    shuffleColors();
-
-    // Random shape
-    const shapes = ['rect', 'circle', 'diamond', 'parallelogram', 'hexagon', 'mixed'];
-    document.getElementById('shape').value = shapes[Math.floor(Math.random() * shapes.length)];
-
-    // Random layout
-    const layouts = ['grid', 'fibonacci-grid', 'radial'];
-    document.getElementById('layout').value = layouts[Math.floor(Math.random() * layouts.length)];
-
-    // Random depth (2-6)
-    document.getElementById('depth').value = Math.floor(Math.random() * 5) + 2;
-
-    // Random spacing (0-8)
-    document.getElementById('spacing').value = Math.floor(Math.random() * 9);
-
-    // Random border
-    const borders = ['none', 'solid', 'double'];
-    document.getElementById('border').value = borders[Math.floor(Math.random() * borders.length)];
-
-    // Random radius (0-20)
-    document.getElementById('radius').value = Math.floor(Math.random() * 21);
-
-    playRegenerate();
-    generateGrid(p);
+  // Shuffle button - alternates between color shuffle and full random mix
+  let shuffleMode = 0;
+  document.getElementById('btnShuffle').addEventListener('click', () => {
+    shuffleMode = (shuffleMode + 1) % 2;
+    if (shuffleMode === 1) {
+      // Just shuffle colors
+      playShuffle();
+      shuffleColors();
+    } else {
+      // Full random mix
+      shuffleColors();
+      const shapes = ['rect', 'circle', 'diamond', 'parallelogram', 'hexagon', 'mixed'];
+      document.getElementById('shape').value = shapes[Math.floor(Math.random() * shapes.length)];
+      const layouts = ['grid', 'fibonacci-grid', 'radial'];
+      document.getElementById('layout').value = layouts[Math.floor(Math.random() * layouts.length)];
+      document.getElementById('depth').value = Math.floor(Math.random() * 5) + 2;
+      document.getElementById('spacing').value = Math.floor(Math.random() * 9);
+      const borders = ['none', 'solid', 'double'];
+      document.getElementById('border').value = borders[Math.floor(Math.random() * borders.length)];
+      document.getElementById('radius').value = Math.floor(Math.random() * 21);
+      playRegenerate();
+      generateGrid(p);
+    }
   });
 
   document.getElementById('btnPlay').addEventListener('click', () => {
@@ -2537,9 +2481,7 @@ new p5(function(p) {
     if (soundOn) {
       icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>';
       btn.classList.remove('muted');
-      playSoundOn();
     } else {
-      playSoundOff();
       icon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
       btn.classList.add('muted');
     }
@@ -3015,7 +2957,7 @@ new p5(function(p) {
       osc2.stop(now + mood.decay + 0.1);
     }, mood.tempo + Math.random() * (mood.tempo * 0.3));
 
-    document.getElementById('ramsSongTitle').textContent = mood.name;
+    document.getElementById('ramsSongTitle').textContent = mood.name + ' · click to stop';
   }
 
   function ramsStopAmbient() {
@@ -3033,33 +2975,40 @@ new p5(function(p) {
     }
   }
 
-  document.getElementById('ramsSpeaker').addEventListener('click', () => {
-    const speaker = document.getElementById('ramsSpeaker');
-    const rings = document.getElementById('ramsRings');
+  // Click to toggle ambient on/off, double-click to change mood
+  let clickTimer = null;
+  document.getElementById('ramsSpeaker').addEventListener('click', (e) => {
+    if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; return; } // ignore if dblclick
+    clickTimer = setTimeout(() => {
+      clickTimer = null;
+      const speaker = document.getElementById('ramsSpeaker');
+      const rings = document.getElementById('ramsRings');
+      const songTitle = document.getElementById('ramsSongTitle');
+      if (ramsPlaying) {
+        ramsPlaying = false;
+        speaker.classList.remove('playing');
+        rings.style.opacity = '0';
+        ramsStopAmbient();
+        songTitle.textContent = 'click to play';
+      } else {
+        ramsPlaying = true;
+        speaker.classList.add('playing');
+        rings.style.opacity = '1';
+        currentMood = Math.floor(Math.random() * ramsMoods.length);
+        ramsGenerateAmbient();
+        setTimeout(() => { if (ramsPlaying) songTitle.textContent = ramsMoods[currentMood].name + ' · dblclick to change'; }, 100);
+      }
+    }, 250);
+  });
 
+  document.getElementById('ramsSpeaker').addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; }
     if (ramsPlaying) {
-      // If playing, shuffle to next mood
       ramsStopAmbient();
       currentMood = (currentMood + 1) % ramsMoods.length;
       setTimeout(() => ramsGenerateAmbient(), 200);
-    } else {
-      // Start playing
-      ramsPlaying = true;
-      speaker.classList.add('playing');
-      rings.style.opacity = '1';
-      currentMood = Math.floor(Math.random() * ramsMoods.length);
-      ramsGenerateAmbient();
     }
-  });
-
-  // Double-click to stop
-  document.getElementById('ramsSpeaker').addEventListener('dblclick', () => {
-    ramsPlaying = false;
-    const speaker = document.getElementById('ramsSpeaker');
-    const rings = document.getElementById('ramsRings');
-    speaker.classList.remove('playing');
-    rings.style.opacity = '0';
-    ramsStopAmbient();
   });
 
 }, document.body);
