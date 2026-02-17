@@ -140,10 +140,6 @@ select:focus { border-color: #1d1d1f; }
   display: none;
 }
 
-/* Dieter Rams speaker */
-#ramsSpeaker:hover { border-color: #ccc; box-shadow: 0 0 0 4px rgba(0,0,0,0.03); }
-#ramsSpeaker.playing { border-color: #E8356D; }
-#ramsSpeaker.playing:hover { box-shadow: 0 0 0 4px rgba(232,53,109,0.08); }
 
 /* Export modal */
 #exportModal {
@@ -623,7 +619,6 @@ select:focus { border-color: #1d1d1f; }
   .actions { padding: 12px 16px; gap: 8px; flex-wrap: wrap; justify-content: center; }
   .action-btn { width: 44px; height: 44px; }
 
-  #ramsPlayer { display: none; }
 
   /* About modal mobile */
   #aboutModal { padding: 10px; }
@@ -899,42 +894,6 @@ select:focus { border-color: #1d1d1f; }
       <div class="toggle-wrap">
         <div class="toggle" id="animateToggle"><div class="toggle-knob"></div></div>
       </div>
-    </div>
-  </div>
-
-  <!-- DIETER RAMS SPEAKER — Song of the Week -->
-  <div id="ramsPlayer" style="padding:16px 12px 12px; text-align:center;">
-    <div id="ramsSpeaker" style="width:80px; height:80px; margin:0 auto; border-radius:50%; border:2px solid #ddd; background:#f9f9f9; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; position:relative;">
-      <!-- Concentric rings like Braun SK radio speaker -->
-      <svg viewBox="0 0 80 80" width="60" height="60" style="position:absolute;">
-        <circle cx="40" cy="40" r="36" fill="none" stroke="#e0e0e0" stroke-width="1"/>
-        <circle cx="40" cy="40" r="28" fill="none" stroke="#e8e8e8" stroke-width="0.8"/>
-        <circle cx="40" cy="40" r="20" fill="none" stroke="#eee" stroke-width="0.6"/>
-        <circle cx="40" cy="40" r="12" fill="none" stroke="#f0f0f0" stroke-width="0.5"/>
-        <circle cx="40" cy="40" r="5" fill="#ddd"/>
-      </svg>
-      <!-- Animated rings when playing -->
-      <svg id="ramsRings" viewBox="0 0 80 80" width="60" height="60" style="position:absolute; opacity:0; transition:opacity 0.3s;">
-        <circle cx="40" cy="40" r="36" fill="none" stroke="#E8356D" stroke-width="1" opacity="0.3">
-          <animate attributeName="r" values="36;38;36" dur="1.2s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="1.2s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="40" cy="40" r="28" fill="none" stroke="#F47A20" stroke-width="0.8" opacity="0.3">
-          <animate attributeName="r" values="28;30;28" dur="0.9s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values="0.3;0.5;0.3" dur="0.9s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="40" cy="40" r="20" fill="none" stroke="#1A9E96" stroke-width="0.6" opacity="0.3">
-          <animate attributeName="r" values="20;22;20" dur="0.7s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="40" cy="40" r="5" fill="#E8356D">
-          <animate attributeName="r" values="5;6;5" dur="0.6s" repeatCount="indefinite"/>
-        </circle>
-      </svg>
-    </div>
-    <div style="margin-top:8px; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:#bbb; font-family:'SF Mono',SFMono-Regular,Menlo,monospace;">Song of the Week</div>
-    <div id="ramsSongTitle" style="margin-top:3px; font-size:9px; color:#999; min-height:12px;"></div>
-    <div id="ramsSongNote" style="margin-top:6px; font-size:7px; color:#ccc; letter-spacing:0.5px; line-height:1.4;">
-      Powered by royalty-free music
     </div>
   </div>
 
@@ -1315,22 +1274,42 @@ function ensureAudio() {
 function playClick() {
   if (!soundOn) return; ensureAudio();
   const t = audioCtx.currentTime;
+  // Satisfying mechanical click - short noise burst + resonant pop
+  const bufLen = audioCtx.sampleRate * 0.015;
+  const buf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufLen);
+  const noise = audioCtx.createBufferSource(); noise.buffer = buf;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'highpass'; filter.frequency.value = 2000;
+  const ng = audioCtx.createGain();
+  ng.gain.setValueAtTime(0.25, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+  noise.connect(filter); filter.connect(ng); ng.connect(compressor);
+  noise.start(t); noise.stop(t + 0.02);
+  // Add a little "pop" resonance
   const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-  osc.type = 'sine'; osc.frequency.setValueAtTime(880, t);
-  osc.frequency.exponentialRampToValueAtTime(440, t + 0.04);
-  gain.gain.setValueAtTime(0.12, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-  osc.connect(gain); gain.connect(compressor); osc.start(t); osc.stop(t + 0.08);
+  osc.type = 'sine'; osc.frequency.value = 1800 + Math.random() * 400;
+  gain.gain.setValueAtTime(0.08, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+  osc.connect(gain); gain.connect(compressor); osc.start(t); osc.stop(t + 0.03);
   flashSoundDot();
 }
 
-// Micro-tick — slider scrubbing
+// Micro-tick — slider scrubbing (soft tactile tick)
 function playTick() {
   if (!soundOn) return; ensureAudio();
   const t = audioCtx.currentTime;
-  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-  osc.type = 'sine'; osc.frequency.value = 1200 + Math.random() * 200;
-  gain.gain.setValueAtTime(0.05, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
-  osc.connect(gain); gain.connect(compressor); osc.start(t); osc.stop(t + 0.035);
+  // Tiny tactile tick like a detent
+  const bufLen = audioCtx.sampleRate * 0.008;
+  const buf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufLen) * 0.5;
+  const noise = audioCtx.createBufferSource(); noise.buffer = buf;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'highpass'; filter.frequency.value = 3000;
+  const ng = audioCtx.createGain();
+  ng.gain.setValueAtTime(0.12, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.01);
+  noise.connect(filter); filter.connect(ng); ng.connect(compressor);
+  noise.start(t); noise.stop(t + 0.012);
   flashSoundDot();
 }
 
@@ -2694,81 +2673,6 @@ new p5(function(p) {
       const area = document.getElementById('colorPickerArea');
       if (area) area.style.display = 'none';
       customSwatches = [];
-    }
-  });
-
-  // =============================================
-  // DIETER RAMS SPEAKER — Generative ambient music
-  // Uses Web Audio API to create original ambient tones
-  // No copyright issues — it's procedurally generated!
-  // =============================================
-  let ramsPlaying = false;
-  let ramsNodes = [];
-  const ramsTitles = [
-    'Ambient Grid No. 1', 'Golden Drift', 'Ratio in C',
-    'Subdivide', 'Fibonacci Haze', 'PHI Minor',
-    'Braun Tone 606', 'Module Pulse', 'Grid Whisper',
-    'Harmonic Section', 'Quiet Ratio', 'System Hum'
-  ];
-
-  function ramsGenerateAmbient() {
-    ensureAudio();
-    const t = audioCtx.currentTime;
-    // Create layered ambient drone from golden ratio intervals
-    const base = 110 + Math.random() * 55; // A2-D3 range
-    const ratios = [1, PHI_RATIO, 1/PHI_RATIO, 2, PHI_RATIO * 2];
-
-    ratios.forEach((ratio, i) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const pan = audioCtx.createStereoPanner();
-      osc.type = i < 2 ? 'sine' : 'triangle';
-      osc.frequency.value = base * ratio;
-      // Slow LFO on frequency for gentle movement
-      const lfo = audioCtx.createOscillator();
-      const lfoGain = audioCtx.createGain();
-      lfo.frequency.value = 0.05 + Math.random() * 0.1;
-      lfoGain.gain.value = base * ratio * 0.008;
-      lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-      lfo.start(t);
-
-      pan.pan.value = (i / ratios.length) * 2 - 1; // spread across stereo
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.015 / (i + 1), t + 3); // very gentle fade in
-      osc.connect(gain); gain.connect(pan); pan.connect(compressor);
-      osc.start(t);
-      ramsNodes.push({ osc, gain, lfo, pan });
-    });
-
-    // Pick a title based on current week of year
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const week = Math.floor((now - startOfYear) / (7 * 24 * 60 * 60 * 1000)) % ramsTitles.length;
-    document.getElementById('ramsSongTitle').textContent = ramsTitles[week];
-  }
-
-  function ramsStopAmbient() {
-    const t = audioCtx ? audioCtx.currentTime : 0;
-    ramsNodes.forEach(({ osc, gain, lfo }) => {
-      gain.gain.linearRampToValueAtTime(0.001, t + 2);
-      osc.stop(t + 2.1);
-      lfo.stop(t + 2.1);
-    });
-    ramsNodes = [];
-  }
-
-  document.getElementById('ramsSpeaker').addEventListener('click', () => {
-    ramsPlaying = !ramsPlaying;
-    const speaker = document.getElementById('ramsSpeaker');
-    const rings = document.getElementById('ramsRings');
-    if (ramsPlaying) {
-      speaker.classList.add('playing');
-      rings.style.opacity = '1';
-      ramsGenerateAmbient();
-    } else {
-      speaker.classList.remove('playing');
-      rings.style.opacity = '0';
-      ramsStopAmbient();
     }
   });
 
