@@ -3770,7 +3770,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('btnUndo').classList.add('has-history');
 
       // Algorithm to generate safe PHI compositions (50+ combinations)
-      // Only use valid select options: cols = [3,4,5,6,8,9,10,12]
+      // Only use valid select options
       var isMobile = window.innerWidth <= 768;
 
       // Valid values from the actual select/input elements
@@ -3778,7 +3778,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var validDepths = isMobile ? [2, 3, 4] : [2, 3, 4, 5];
       var validSplits = ['alternate', 'horizontal', 'vertical', 'random'];
       var validShapes = ['rect', 'circle', 'diamond', 'mixed'];
-      var validGaps = isMobile ? [0, 2, 4] : [0, 2, 4, 6, 8];
+      var validGaps = isMobile ? [0, 2, 4] : [0, 2, 4, 6];
       var validRadii = [0, 4, 8, 12];
 
       // Pick random from each array
@@ -3789,6 +3789,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cols: pick(validCols),
         split: pick(validSplits),
         shape: pick(validShapes),
+        layout: 'grid',  // Always use grid - it's the most reliable
         gap: pick(validGaps),
         radius: pick(validRadii)
       };
