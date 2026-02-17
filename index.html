@@ -200,14 +200,6 @@ select:focus { border-color: #1d1d1f; }
 }
 @keyframes recBlink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* Sound indicator */
-.sound-dot {
-  position: fixed; top: 16px; left: 16px;
-  width: 8px; height: 8px; border-radius: 50%;
-  background: #ddd; z-index: 100; transition: all 0.15s;
-}
-.sound-dot.active { background: #E8356D; box-shadow: 0 0 8px rgba(232,53,109,0.4); }
-
 /* Panel toggle button — clean minimal */
 #panelToggle {
   position: fixed; top: 50%; right: 260px; transform: translateY(-50%);
@@ -466,13 +458,17 @@ select:focus { border-color: #1d1d1f; }
 #welcomeModal {
   position: fixed; inset: 0; z-index: 400;
   display: none; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+  background: #faf9f7;
 }
 #welcomeModal.show { display: flex; }
+#welcomePattern {
+  position: absolute; inset: 0; opacity: 0.6;
+}
 .welcome-card {
-  background: #fff; border-radius: 20px; padding: 32px;
-  max-width: 420px; width: 90%; box-shadow: 0 12px 48px rgba(0,0,0,0.12);
-  border: 1px solid #eee; max-height: 85vh; overflow-y: auto;
+  background: rgba(255,255,255,0.95); border-radius: 20px; padding: 32px;
+  max-width: 420px; width: 90%; box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.8); max-height: 85vh; overflow-y: auto;
+  position: relative; z-index: 1; backdrop-filter: blur(10px);
 }
 .welcome-card h2 {
   font-size: 22px; font-weight: 600; color: #1d1d1f;
@@ -539,7 +535,7 @@ select:focus { border-color: #1d1d1f; }
    ========================================== */
 @media (max-width: 768px) {
   /* Hide sound dot and desktop panel toggle on mobile */
-  #panelToggle, .sound-dot, #ramsPlayer { display: none; }
+  #panelToggle, #ramsPlayer { display: none; }
 
   /* Canvas is square */
   canvas {
@@ -688,7 +684,6 @@ select:focus { border-color: #1d1d1f; }
 </head>
 <body>
 
-<div class="sound-dot" id="soundDot"></div>
 <div id="recIndicator"><div class="rec-dot"></div><span>Recording</span></div>
 
 <!-- Panel toggle — always visible -->
@@ -989,6 +984,7 @@ select:focus { border-color: #1d1d1f; }
 
 <!-- WELCOME MODAL (first visit) -->
 <div id="welcomeModal">
+  <canvas id="welcomePattern"></canvas>
   <div class="welcome-card">
     <h2>Golden Grid</h2>
     <div class="welcome-sub">Your colors in perfect ratio</div>
@@ -1514,10 +1510,7 @@ function playCellTone(x, y, w, h) {
 function playSave() { playExport(); }
 
 function flashSoundDot() {
-  const dot = document.getElementById('soundDot');
-  dot.classList.add('active');
-  clearTimeout(window._dotTimeout);
-  window._dotTimeout = setTimeout(() => dot.classList.remove('active'), 150);
+  // Sound indicator removed - function kept for compatibility
 }
 
 // =============================================
@@ -2469,8 +2462,71 @@ new p5(function(p) {
 
   // Welcome modal (first visit)
   const WELCOME_KEY = 'golden-grid-welcome-seen';
+
+  // Draw dynamic pattern background
+  function drawWelcomePattern() {
+    const canvas = document.getElementById('welcomePattern');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Colors - soft pastels matching the app palette
+    const colors = [
+      '#E8707A', '#F2A65A', '#E8CF5A', '#9B8FD4', '#D4A5C9',
+      '#8B9A4A', '#6B9A9A', '#E8A040', '#C9A5D4'
+    ];
+
+    // Background
+    ctx.fillStyle = '#faf9f7';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw scattered shapes
+    const shapes = ['circle', 'pill', 'diamond', 'rect'];
+    const cellSize = 45;
+    const cols = Math.ceil(canvas.width / cellSize) + 1;
+    const rows = Math.ceil(canvas.height / cellSize) + 1;
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        if (Math.random() > 0.7) continue; // Skip some cells
+
+        const x = col * cellSize + (Math.random() - 0.5) * 20;
+        const y = row * cellSize + (Math.random() - 0.5) * 20;
+        const size = 4 + Math.random() * 16;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const alpha = 0.3 + Math.random() * 0.5;
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+
+        ctx.fillStyle = color;
+        ctx.globalAlpha = alpha;
+
+        ctx.beginPath();
+        if (shape === 'circle') {
+          ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (shape === 'pill') {
+          const w = size * (1.5 + Math.random() * 2);
+          const h = size * 0.6;
+          const r = h / 2;
+          ctx.roundRect(x - w/2, y - h/2, w, h, r);
+          ctx.fill();
+        } else if (shape === 'diamond') {
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(Math.PI / 4);
+          ctx.fillRect(-size/3, -size/3, size/1.5, size/1.5);
+          ctx.restore();
+        } else {
+          ctx.fillRect(x - size/2, y - size/4, size, size/2);
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
   if (!localStorage.getItem(WELCOME_KEY)) {
     document.getElementById('welcomeModal').classList.add('show');
+    drawWelcomePattern();
   }
   document.getElementById('welcomeStart').addEventListener('click', () => {
     const dontShow = document.getElementById('welcomeDontShow').checked;
