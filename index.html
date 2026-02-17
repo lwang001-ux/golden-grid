@@ -523,12 +523,18 @@ select:focus { border-color: #1d1d1f; }
   padding: 10px 12px; display: flex; align-items: flex-start; gap: 10px;
 }
 .control-item .ctrl-icon {
-  width: 20px; height: 20px; flex-shrink: 0; opacity: 0.6;
+  width: 20px; height: 20px; flex-shrink: 0;
 }
 .control-item .ctrl-icon svg {
-  width: 100%; height: 100%; stroke: #666; stroke-width: 1.5;
+  width: 100%; height: 100%; stroke-width: 1.5;
   fill: none; stroke-linecap: round; stroke-linejoin: round;
 }
+.control-item:nth-child(1) .ctrl-icon svg { stroke: #E8356D; }
+.control-item:nth-child(2) .ctrl-icon svg { stroke: #F47A20; }
+.control-item:nth-child(3) .ctrl-icon svg { stroke: #8B9A4A; }
+.control-item:nth-child(4) .ctrl-icon svg { stroke: #9B8FD4; }
+.control-item:nth-child(5) .ctrl-icon svg { stroke: #1A9E96; }
+.control-item:nth-child(6) .ctrl-icon svg { stroke: #2E5BA8; }
 .control-item .ctrl-text { flex: 1; }
 .control-item .ctrl-name {
   font-size: 10px; font-weight: 600; color: #1d1d1f; margin-bottom: 3px;
@@ -1033,7 +1039,7 @@ select:focus { border-color: #1d1d1f; }
     <div class="welcome-steps">
       <div class="welcome-step">
         <div class="step-num s1">1</div>
-        <div class="step-text"><strong>Choose a palette</strong> — upload any image to extract 5 colors or pick from built-in palettes</div>
+        <div class="step-text"><strong>Choose a palette</strong> — pick from built-in colors or upload any image to extract its palette</div>
       </div>
       <div class="welcome-step">
         <div class="step-num s2">2</div>
@@ -1041,7 +1047,7 @@ select:focus { border-color: #1d1d1f; }
       </div>
       <div class="welcome-step">
         <div class="step-num s3">3</div>
-        <div class="step-text"><strong>Export your art</strong> — save as desktop wallpaper, phone wallpaper, square, print resolution, or video</div>
+        <div class="step-text"><strong>Export your art</strong> — save as desktop or phone wallpaper, save for posts, cards, print and hang on your wall or make as an animated screensaver</div>
       </div>
     </div>
 
