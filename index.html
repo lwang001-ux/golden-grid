@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
 <title>Golden Ratio Grid — Lesa's Color Palettes</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 <style>
@@ -97,7 +98,12 @@ select {
   background: #fff; color: #1d1d1f; border: 1px solid #e0e0e0;
   border-radius: 6px; padding: 4px 8px; font-size: 10px;
   font-family: 'Inter', sans-serif; outline: none; cursor: pointer; transition: all 0.15s;
+  color-scheme: light; -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 6px center;
+  padding-right: 20px;
 }
+select option { background: #fff; color: #1d1d1f; }
 select:hover { border-color: #ccc; }
 select:focus { border-color: #1d1d1f; }
 
