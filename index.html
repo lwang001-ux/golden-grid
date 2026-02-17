@@ -119,8 +119,8 @@ select:focus { border-color: #1d1d1f; }
 .act-btn:hover { transform:scale(1.08); border-color:#ccc; }
 .act-btn:active { transform:scale(0.95); }
 .act-btn svg { width:14px; height:14px; stroke-width:1.8; fill:none; }
-#btnUndo svg { stroke:#999; }
-#btnUndo.has-history svg { stroke:#1d1d1f; }
+#btnUndo svg { stroke:#ccc; }
+#btnUndo.has-history svg { stroke:#2E5BA8; }
 #btnRegen svg { stroke:#E8356D; }
 #btnShuffle svg { stroke:#F47A20; }
 #btnRandom svg { stroke:#8B9A4A; }
@@ -132,6 +132,17 @@ select:focus { border-color: #1d1d1f; }
 /* Button states */
 #btnPlay.playing svg { stroke:#D42B3E; }
 #btnSound.muted svg { stroke:#ccc; }
+
+/* Button tooltips */
+.act-btn { position: relative; }
+.act-btn::after {
+  content: attr(data-tip);
+  position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%);
+  background: #1d1d1f; color: #fff; font-size: 9px; padding: 3px 6px;
+  border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.act-btn:hover::after { opacity: 1; }
 
 /* Auto-play progress ring */
 .progress-ring {
@@ -726,16 +737,16 @@ select:focus { border-color: #1d1d1f; }
 
   <div class="section" id="palSection"></div>
 
-  <!-- ACTIONS — 8 Dieter Rams style buttons -->
+  <!-- ACTIONS — 8 buttons with tooltips -->
   <div class="act-row">
-    <div class="act-btn" id="btnUndo" title="Go back"><svg viewBox="0 0 24 24"><path d="M3 10h10a5 5 0 0 1 5 5v2M3 10l5-5M3 10l5 5"/></svg></div>
-    <div class="act-btn" id="btnRegen" title="New composition"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></div>
-    <div class="act-btn" id="btnShuffle" title="Shuffle colors"><svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
-    <div class="act-btn" id="btnRandom" title="Random mix"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="15.5" cy="15.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="15.5" cy="8.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="8.5" cy="15.5" r="1.5" fill="#8B9A4A" stroke="none"/></svg></div>
-    <div class="act-btn" id="btnPlay" title="Auto-play"><svg viewBox="0 0 24 24" id="playIcon"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
-    <div class="act-btn" id="btnExport" title="Export"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-    <div class="act-btn" id="btnRecent" title="Save to gallery"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
-    <div class="act-btn" id="btnSound" title="Sound on/off"><svg viewBox="0 0 24 24" id="soundIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
+    <div class="act-btn" id="btnUndo" data-tip="Undo last change"><svg viewBox="0 0 24 24"><path d="M3 10h10a5 5 0 0 1 5 5v2M3 10l5-5M3 10l5 5"/></svg></div>
+    <div class="act-btn" id="btnRegen" data-tip="New composition"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></div>
+    <div class="act-btn" id="btnShuffle" data-tip="Shuffle colors"><svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
+    <div class="act-btn" id="btnRandom" data-tip="Randomize all"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="15.5" cy="15.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="15.5" cy="8.5" r="1.5" fill="#8B9A4A" stroke="none"/><circle cx="8.5" cy="15.5" r="1.5" fill="#8B9A4A" stroke="none"/></svg></div>
+    <div class="act-btn" id="btnPlay" data-tip="Auto-play"><svg viewBox="0 0 24 24" id="playIcon"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
+    <div class="act-btn" id="btnExport" data-tip="Download image"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+    <div class="act-btn" id="btnRecent" data-tip="Save to Recents ↓"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+    <div class="act-btn" id="btnSound" data-tip="Sound on/off"><svg viewBox="0 0 24 24" id="soundIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
   </div>
 
   <!-- AUTO-PLAY SETTINGS -->
@@ -2483,6 +2494,17 @@ new p5(function(p) {
   document.getElementById('btnRecent').addEventListener('click', () => {
     addToGallery(p);
     playClick();
+    // Visual feedback - scroll to gallery and flash
+    const gallerySection = document.getElementById('gallerySection');
+    if (gallerySection) {
+      gallerySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const firstItem = document.querySelector('.gallery-item');
+      if (firstItem) {
+        firstItem.style.transition = 'box-shadow 0.3s';
+        firstItem.style.boxShadow = '0 0 0 3px #E57373';
+        setTimeout(() => { firstItem.style.boxShadow = ''; }, 1000);
+      }
+    }
   });
   document.getElementById('modalClose').addEventListener('click', () => {
     document.getElementById('exportModal').classList.remove('show');
@@ -2709,18 +2731,10 @@ new p5(function(p) {
         img.onload = function() {
           const colors = extractColorsFromImage(img, 5);
           if (colors.length >= 3) {
-            // Create thumbnail (48x48)
-            const thumbCanvas = document.createElement('canvas');
-            thumbCanvas.width = 48; thumbCanvas.height = 48;
-            const thumbCtx = thumbCanvas.getContext('2d');
-            thumbCtx.drawImage(img, 0, 0, 48, 48);
-            const thumbnail = thumbCanvas.toDataURL('image/jpeg', 0.7);
-
             const name = generatePaletteName(colors);
             PALETTES.push({
               name,
               colors,
-              thumbnail,
               userCreated: true,
               createdAt: Date.now()
             });
