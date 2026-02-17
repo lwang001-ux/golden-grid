@@ -938,6 +938,7 @@ select:focus { border-color: #1d1d1f; }
     <div class="hint"><kbd>R</kbd><span>random mix</span></div>
     <div class="hint"><kbd>← →</kbd><span>palette</span></div>
     <div class="hint"><kbd>F</kbd><span>fullscreen</span></div>
+    <div class="hint"><kbd>M</kbd><span>ambient</span></div>
     <div class="hint"><kbd>Esc</kbd><span>exit</span></div>
   </div>
 </div>
@@ -2263,6 +2264,10 @@ new p5(function(p) {
     if (p.key === 'f' || p.key === 'F') {
       if (!document.fullscreenElement) document.documentElement.requestFullscreen();
       else document.exitFullscreen();
+      return false;
+    }
+    if (p.key === 'm' || p.key === 'M') {
+      document.getElementById('ramsSpeaker').click();
       return false;
     }
     if (p.keyCode === p.LEFT_ARROW) {
