@@ -80,20 +80,16 @@ body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica N
 
 input[type="range"] {
   -webkit-appearance: none; appearance: none;
-  width: 88px; height: 4px; outline: none;
-  background-image: radial-gradient(circle, #ddd 0.8px, transparent 0.8px);
-  background-size: 4px 4px;
-  background-position: 0 center;
+  width: 88px; height: 1px; outline: none;
+  background: #1d1d1f;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
   width: 8px; height: 8px; border-radius: 50%;
   background: #1d1d1f; cursor: pointer;
-  transition: transform 0.1s;
   box-shadow: none; border: none;
 }
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-input[type="range"]:active::-webkit-slider-thumb { background: #333; }
+input[type="range"]::-webkit-slider-thumb:hover { cursor: pointer; }
 
 select {
   background: #fff; color: #1d1d1f; border: 1px solid #e0e0e0;
