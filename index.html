@@ -39,18 +39,20 @@ body { background: #ffffff; overflow: hidden; font-family: 'Inter', 'Helvetica N
   color: #444; margin-bottom: 10px;
 }
 
-/* Gallery - recent generations */
+/* Gallery - recent generations (3 items max, phi-inspired) */
 .gallery-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
 }
 .gallery-item {
-  aspect-ratio: 1; border-radius: 6px; overflow: hidden;
-  cursor: pointer; transition: all 0.15s; border: 2px solid transparent;
+  width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+  cursor: pointer; transition: all 0.15s; border: 2px solid #eee;
+  background: #f5f5f5;
 }
-.gallery-item:hover { transform: scale(1.05); border-color: #9B8FD4; }
+.gallery-item:hover { transform: scale(1.05); border-color: #E57373; }
 .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
 .gallery-empty {
-  font-size: 9px; color: #999; text-align: center; padding: 12px;
+  grid-column: 1 / -1;
+  font-size: 9px; color: #999; text-align: center; padding: 16px;
 }
 .gallery-clear {
   font-size: 8px; color: #bbb; cursor: pointer; text-align: right;
@@ -1215,7 +1217,7 @@ function saveUserPalettes() {
 // GALLERY — Recent generations
 // =============================================
 const GALLERY_KEY = 'golden-grid-gallery';
-const MAX_GALLERY = 8;
+const MAX_GALLERY = 3; // Phi-inspired: keep only 3 recent designs
 let galleryItems = [];
 
 function loadGallery() {
@@ -1234,14 +1236,14 @@ function saveGallery() {
 function addToGallery(p) {
   // Capture current canvas as thumbnail
   const canvas = document.querySelector('canvas');
-  if (!canvas) return;
+  if (!canvas) { console.warn('No canvas found'); return; }
 
-  // Create small thumbnail
+  // Create small thumbnail (72x72 to match display)
   const thumb = document.createElement('canvas');
-  thumb.width = 100; thumb.height = 100;
+  thumb.width = 72; thumb.height = 72;
   const ctx = thumb.getContext('2d');
-  ctx.drawImage(canvas, 0, 0, 100, 100);
-  const dataUrl = thumb.toDataURL('image/jpeg', 0.7);
+  ctx.drawImage(canvas, 0, 0, 72, 72);
+  const dataUrl = thumb.toDataURL('image/jpeg', 0.6); // Lower quality for smaller size
 
   // Store with current settings
   const item = {
@@ -1272,7 +1274,7 @@ function renderGallery() {
   if (!grid) return;
 
   if (galleryItems.length === 0) {
-    grid.innerHTML = '<div class="gallery-empty">Generations will appear here</div>';
+    grid.innerHTML = '<div class="gallery-empty">Press bookmark to save designs here</div>';
     return;
   }
 
