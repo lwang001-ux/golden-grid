@@ -115,15 +115,16 @@ select:focus { border-color: #1d1d1f; }
 }
 .toggle.on .toggle-knob { left: calc(100% - 18px); }
 
-/* Action buttons row */
-.act-row { display:flex; gap:1px; padding:5px 6px; justify-content:center; border-bottom:1px solid #f0f0f0; }
-.act-btn { width:20px; height:20px; padding:0; margin:0; border-radius:50%; background:#fff; border:1px solid #ddd; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:none; }
-.act-btn:hover { transform:scale(1.08); border-color:#bbb; }
-.act-btn svg { width:10px; height:10px; stroke-width:2; fill:none; }
+/* Action buttons row — Dieter Rams style black knobs */
+.act-row { display:flex; gap:6px; padding:12px 16px; justify-content:center; border-bottom:1px solid #f0f0f0; }
+.act-btn { width:34px; height:34px; padding:0; margin:0; border-radius:50%; background:#1d1d1f; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.2); transition:transform 0.15s; }
+.act-btn:hover { transform:scale(1.1); }
+.act-btn:active { transform:scale(0.95); }
+.act-btn svg { width:16px; height:16px; stroke-width:1.8; fill:none; stroke:#fff; }
 
 /* Button states */
-#btnPlay.playing svg { stroke: #D42B3E; }
-#btnSound.muted svg { stroke: #ccc; }
+#btnPlay.playing { background:#D42B3E; }
+#btnSound.muted { background:#999; }
 
 /* Auto-play progress ring */
 .progress-ring {
@@ -625,9 +626,9 @@ select:focus { border-color: #1d1d1f; }
   }
 
   .section { padding: 12px 16px; }
-  .act-row { padding: 5px 6px; gap: 2px; }
-  .act-btn { width: 18px; height: 18px; }
-  .act-btn svg { width: 9px; height: 9px; }
+  .act-row { padding: 10px 8px; gap: 4px; }
+  .act-btn { width: 30px; height: 30px; }
+  .act-btn svg { width: 14px; height: 14px; }
 
 
   /* About modal mobile */
@@ -718,14 +719,15 @@ select:focus { border-color: #1d1d1f; }
 
   <div class="section" id="palSection"></div>
 
-  <!-- ACTIONS — 6 buttons -->
+  <!-- ACTIONS — 7 Dieter Rams style buttons -->
   <div class="act-row">
-    <div class="act-btn" id="btnRegen" title="New"><svg viewBox="0 0 24 24" style="stroke:#E8356D"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></div>
-    <div class="act-btn" id="btnShuffle" title="Shuffle"><svg viewBox="0 0 24 24" style="stroke:#F47A20"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
-    <div class="act-btn" id="btnPlay" title="Play"><svg viewBox="0 0 24 24" id="playIcon" style="stroke:#1A9E96"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
-    <div class="act-btn" id="btnExport" title="Export"><svg viewBox="0 0 24 24" style="stroke:#9B59B6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-    <div class="act-btn" id="btnRecent" title="Save"><svg viewBox="0 0 24 24" style="stroke:#E57373"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
-    <div class="act-btn" id="btnSound" title="Sound"><svg viewBox="0 0 24 24" id="soundIcon" style="stroke:#5DADE2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
+    <div class="act-btn" id="btnRegen" title="New composition"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></div>
+    <div class="act-btn" id="btnShuffle" title="Shuffle colors"><svg viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></div>
+    <div class="act-btn" id="btnRandom" title="Random mix"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#fff" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#fff" stroke="none"/><circle cx="15.5" cy="15.5" r="1.5" fill="#fff" stroke="none"/><circle cx="15.5" cy="8.5" r="1.5" fill="#fff" stroke="none"/><circle cx="8.5" cy="15.5" r="1.5" fill="#fff" stroke="none"/></svg></div>
+    <div class="act-btn" id="btnPlay" title="Auto-play"><svg viewBox="0 0 24 24" id="playIcon"><polygon points="6 3 20 12 6 21 6 3"/></svg></div>
+    <div class="act-btn" id="btnExport" title="Export"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+    <div class="act-btn" id="btnRecent" title="Save to gallery"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+    <div class="act-btn" id="btnSound" title="Sound on/off"><svg viewBox="0 0 24 24" id="soundIcon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
   </div>
 
   <!-- AUTO-PLAY SETTINGS -->
@@ -2392,29 +2394,26 @@ new p5(function(p) {
     playRegenerate();
     generateGrid(p);
   });
-  // Shuffle button - alternates between color shuffle and full random mix
-  let shuffleMode = 0;
+  // Shuffle button - just shuffle colors
   document.getElementById('btnShuffle').addEventListener('click', () => {
-    shuffleMode = (shuffleMode + 1) % 2;
-    if (shuffleMode === 1) {
-      // Just shuffle colors
-      playShuffle();
-      shuffleColors();
-    } else {
-      // Full random mix
-      shuffleColors();
-      const shapes = ['rect', 'circle', 'diamond', 'parallelogram', 'hexagon', 'mixed'];
-      document.getElementById('shape').value = shapes[Math.floor(Math.random() * shapes.length)];
-      const layouts = ['grid', 'fibonacci-grid', 'radial'];
-      document.getElementById('layout').value = layouts[Math.floor(Math.random() * layouts.length)];
-      document.getElementById('depth').value = Math.floor(Math.random() * 5) + 2;
-      document.getElementById('spacing').value = Math.floor(Math.random() * 9);
-      const borders = ['none', 'solid', 'double'];
-      document.getElementById('border').value = borders[Math.floor(Math.random() * borders.length)];
-      document.getElementById('radius').value = Math.floor(Math.random() * 21);
-      playRegenerate();
-      generateGrid(p);
-    }
+    playShuffle();
+    shuffleColors();
+  });
+
+  // Random button - randomize everything
+  document.getElementById('btnRandom').addEventListener('click', () => {
+    shuffleColors();
+    const shapes = ['rect', 'circle', 'diamond', 'parallelogram', 'hexagon', 'mixed'];
+    document.getElementById('shape').value = shapes[Math.floor(Math.random() * shapes.length)];
+    const layouts = ['grid', 'fibonacci-grid', 'radial'];
+    document.getElementById('layout').value = layouts[Math.floor(Math.random() * layouts.length)];
+    document.getElementById('depth').value = Math.floor(Math.random() * 5) + 2;
+    document.getElementById('spacing').value = Math.floor(Math.random() * 9);
+    const borders = ['none', 'solid', 'double'];
+    document.getElementById('border').value = borders[Math.floor(Math.random() * borders.length)];
+    document.getElementById('radius').value = Math.floor(Math.random() * 21);
+    playRegenerate();
+    generateGrid(p);
   });
 
   document.getElementById('btnPlay').addEventListener('click', () => {
