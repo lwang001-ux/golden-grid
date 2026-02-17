@@ -140,6 +140,10 @@ select:focus { border-color: #1d1d1f; }
   display: none;
 }
 
+/* Dieter Rams speaker */
+#ramsSpeaker:hover { border-color: #ccc; box-shadow: 0 0 0 4px rgba(0,0,0,0.03); }
+#ramsSpeaker.playing { border-color: #8B9A4A; }
+#ramsSpeaker.playing:hover { box-shadow: 0 0 0 4px rgba(139,154,74,0.12); }
 
 /* Export modal */
 #exportModal {
@@ -535,7 +539,7 @@ select:focus { border-color: #1d1d1f; }
    ========================================== */
 @media (max-width: 768px) {
   /* Hide sound dot and desktop panel toggle on mobile */
-  #panelToggle, .sound-dot { display: none; }
+  #panelToggle, .sound-dot, #ramsPlayer { display: none; }
 
   /* Canvas is square */
   canvas {
@@ -895,6 +899,39 @@ select:focus { border-color: #1d1d1f; }
         <div class="toggle" id="animateToggle"><div class="toggle-knob"></div></div>
       </div>
     </div>
+  </div>
+
+  <!-- AMBIENT MUSIC PLAYER — Desktop only -->
+  <div id="ramsPlayer" style="padding:16px 12px 12px; text-align:center;">
+    <div id="ramsSpeaker" style="width:80px; height:80px; margin:0 auto; border-radius:50%; border:2px solid #ddd; background:#f9f9f9; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; position:relative;">
+      <!-- Concentric rings like Braun SK radio speaker -->
+      <svg viewBox="0 0 80 80" width="60" height="60" style="position:absolute;">
+        <circle cx="40" cy="40" r="36" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+        <circle cx="40" cy="40" r="28" fill="none" stroke="#e8e8e8" stroke-width="0.8"/>
+        <circle cx="40" cy="40" r="20" fill="none" stroke="#eee" stroke-width="0.6"/>
+        <circle cx="40" cy="40" r="12" fill="none" stroke="#f0f0f0" stroke-width="0.5"/>
+        <circle cx="40" cy="40" r="5" fill="#ddd"/>
+      </svg>
+      <!-- Animated rings when playing -->
+      <svg id="ramsRings" viewBox="0 0 80 80" width="60" height="60" style="position:absolute; opacity:0; transition:opacity 0.3s;">
+        <circle cx="40" cy="40" r="36" fill="none" stroke="#8B9A4A" stroke-width="1" opacity="0.3">
+          <animate attributeName="r" values="36;38;36" dur="1.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.3;0.5;0.3" dur="1.5s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="40" cy="40" r="28" fill="none" stroke="#F4A020" stroke-width="0.8" opacity="0.3">
+          <animate attributeName="r" values="28;30;28" dur="1.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.3;0.5;0.3" dur="1.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="40" cy="40" r="20" fill="none" stroke="#E8707A" stroke-width="0.6" opacity="0.3">
+          <animate attributeName="r" values="20;22;20" dur="0.9s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="40" cy="40" r="5" fill="#8B9A4A">
+          <animate attributeName="r" values="5;6;5" dur="0.8s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+    <div style="margin-top:8px; font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:#bbb; font-family:'SF Mono',SFMono-Regular,Menlo,monospace;">Ambient</div>
+    <div id="ramsSongTitle" style="margin-top:3px; font-size:9px; color:#888; min-height:12px;"></div>
   </div>
 
   <div id="hints">
@@ -2673,6 +2710,110 @@ new p5(function(p) {
       const area = document.getElementById('colorPickerArea');
       if (area) area.style.display = 'none';
       customSwatches = [];
+    }
+  });
+
+  // =============================================
+  // AMBIENT MUSIC PLAYER — Happy generative music
+  // Gentle arpeggios, warm pads, major keys
+  // =============================================
+  let ramsPlaying = false;
+  let ramsInterval = null;
+  let ramsPad = null;
+  const ramsTitles = [
+    'Golden Morning', 'Sunlit Grid', 'Phi Garden',
+    'Warm Ratio', 'Gentle Subdivide', 'Soft Fibonacci',
+    'Daylight Haze', 'Happy Module', 'Bright Section',
+    'Calm Pattern', 'Peaceful Grid', 'Light Drift'
+  ];
+
+  function ramsGenerateAmbient() {
+    ensureAudio();
+    const t = audioCtx.currentTime;
+
+    // Major pentatonic scale notes (happy, no dissonance)
+    const scale = [261.6, 293.7, 329.6, 392.0, 440.0, 523.3, 587.3, 659.3, 784.0];
+
+    // Soft warm pad (two notes a fifth apart)
+    const padFreqs = [196.0, 293.7]; // G3 and D4 - warm fifth
+    ramsPad = padFreqs.map(freq => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      filter.type = 'lowpass';
+      filter.frequency.value = 800;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.04, t + 2);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(compressor);
+      osc.start(t);
+      return { osc, gain };
+    });
+
+    // Gentle random arpeggios
+    ramsInterval = setInterval(() => {
+      if (!ramsPlaying) return;
+      const now = audioCtx.currentTime;
+      const note = scale[Math.floor(Math.random() * scale.length)];
+
+      // Bell-like tone
+      const osc = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.value = note;
+      osc2.type = 'sine';
+      osc2.frequency.value = note * 2; // octave above, quieter
+
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+      osc.connect(gain);
+      osc2.connect(gain);
+      gain.connect(compressor);
+
+      osc.start(now);
+      osc2.start(now);
+      osc.stop(now + 1.6);
+      osc2.stop(now + 1.6);
+    }, 800 + Math.random() * 600);
+
+    // Pick a title
+    const titleIndex = Math.floor(Math.random() * ramsTitles.length);
+    document.getElementById('ramsSongTitle').textContent = ramsTitles[titleIndex];
+  }
+
+  function ramsStopAmbient() {
+    if (ramsInterval) {
+      clearInterval(ramsInterval);
+      ramsInterval = null;
+    }
+    if (ramsPad) {
+      const t = audioCtx ? audioCtx.currentTime : 0;
+      ramsPad.forEach(({ osc, gain }) => {
+        gain.gain.linearRampToValueAtTime(0.001, t + 1);
+        osc.stop(t + 1.1);
+      });
+      ramsPad = null;
+    }
+  }
+
+  document.getElementById('ramsSpeaker').addEventListener('click', () => {
+    ramsPlaying = !ramsPlaying;
+    const speaker = document.getElementById('ramsSpeaker');
+    const rings = document.getElementById('ramsRings');
+    if (ramsPlaying) {
+      speaker.classList.add('playing');
+      rings.style.opacity = '1';
+      ramsGenerateAmbient();
+    } else {
+      speaker.classList.remove('playing');
+      rings.style.opacity = '0';
+      ramsStopAmbient();
     }
   });
 
