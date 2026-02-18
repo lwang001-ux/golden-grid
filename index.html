@@ -440,55 +440,11 @@ select:focus { border-color: #1d1d1f; }
   max-width: 440px; width: 90%; box-shadow: 0 12px 48px rgba(0,0,0,0.12);
   border: 1px solid #eee; max-height: 85vh; overflow-y: auto;
 }
-.about-card::-webkit-scrollbar { width: 12px; background: transparent; }
+.about-card::-webkit-scrollbar { width: 3px; }
 .about-card::-webkit-scrollbar-track { background: transparent; }
 .about-card::-webkit-scrollbar-thumb {
-  background: transparent !important;
-  border: 4px solid transparent !important;
-  border-left: 4px solid transparent !important;
-  box-shadow:
-    inset 0 0 0 10px transparent,
-    0 0 0 0 transparent,
-    2px 4px 0 0 #E84858,
-    2px 14px 0 0 #E84858,
-    2px 24px 0 0 #E84858,
-    2px 34px 0 0 #E84858,
-    2px 44px 0 0 #E84858,
-    2px 54px 0 0 #E84858,
-    2px 64px 0 0 #E84858,
-    2px 74px 0 0 #E84858,
-    2px 84px 0 0 #E84858,
-    2px 94px 0 0 #E84858,
-    2px 104px 0 0 #E84858,
-    2px 114px 0 0 #E84858,
-    2px 124px 0 0 #E84858,
-    2px 134px 0 0 #E84858,
-    2px 144px 0 0 #E84858,
-    2px 154px 0 0 #E84858,
-    2px 164px 0 0 #E84858,
-    2px 174px 0 0 #E84858,
-    2px 184px 0 0 #E84858,
-    2px 194px 0 0 #E84858,
-    2px 204px 0 0 #E84858,
-    2px 214px 0 0 #E84858,
-    2px 224px 0 0 #E84858,
-    2px 234px 0 0 #E84858,
-    2px 244px 0 0 #E84858,
-    2px 254px 0 0 #E84858,
-    2px 264px 0 0 #E84858,
-    2px 274px 0 0 #E84858,
-    2px 284px 0 0 #E84858,
-    2px 294px 0 0 #E84858,
-    2px 304px 0 0 #E84858,
-    2px 314px 0 0 #E84858,
-    2px 324px 0 0 #E84858,
-    2px 334px 0 0 #E84858,
-    2px 344px 0 0 #E84858,
-    2px 354px 0 0 #E84858,
-    2px 364px 0 0 #E84858,
-    2px 374px 0 0 #E84858,
-    2px 384px 0 0 #E84858;
-  border-radius: 50px;
+  background: #E84858;
+  border-radius: 2px;
 }
 .about-card h2 {
   font-size: 18px; font-weight: 600; color: #1d1d1f;
@@ -1015,13 +971,12 @@ select:focus { border-color: #1d1d1f; }
     scrollbar-width: thin;
     scrollbar-color: #E84858 transparent;
   }
-  /* Red dot scrollbar for mobile */
-  .about-card::-webkit-scrollbar, .welcome-card::-webkit-scrollbar { width: 12px !important; }
-  .about-card::-webkit-scrollbar-track, .welcome-card::-webkit-scrollbar-track { background: transparent !important; margin: 20px 0; }
+  /* Thin red scrollbar for mobile */
+  .about-card::-webkit-scrollbar, .welcome-card::-webkit-scrollbar { width: 3px !important; }
+  .about-card::-webkit-scrollbar-track, .welcome-card::-webkit-scrollbar-track { background: transparent !important; }
   .about-card::-webkit-scrollbar-thumb, .welcome-card::-webkit-scrollbar-thumb {
-    background: radial-gradient(circle, #E84858 2px, transparent 2px) !important;
-    background-size: 12px 10px !important;
-    background-position: center !important;
+    background: #E84858 !important;
+    border-radius: 2px !important;
   }
 }
 </style>
