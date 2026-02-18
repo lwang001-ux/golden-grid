@@ -440,14 +440,16 @@ select:focus { border-color: #1d1d1f; }
   max-width: 440px; width: 90%; box-shadow: 0 12px 48px rgba(0,0,0,0.12);
   border: 1px solid #eee; max-height: 85vh; overflow-y: auto;
 }
-.about-card::-webkit-scrollbar { width: 16px; }
-.about-card::-webkit-scrollbar-track { background: transparent; margin: 24px 0; }
+.about-card::-webkit-scrollbar { width: 8px; }
+.about-card::-webkit-scrollbar-track { background: transparent; }
 .about-card::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-left: 4px dotted #E84858;
-  border-right: none;
-  border-top: none;
-  border-bottom: none;
+  background-color: transparent;
+  background-image:
+    radial-gradient(circle at center, #E84858 3px, transparent 3px);
+  background-size: 8px 12px;
+  background-repeat: repeat-y;
+  border: none;
+  border-radius: 0;
 }
 .about-card h2 {
   font-size: 18px; font-weight: 600; color: #1d1d1f;
