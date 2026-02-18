@@ -1,4 +1,16 @@
 {
   "version": 2,
-  "name": "lw0226-phi"
+  "name": "lw0226-phi",
+  "buildCommand": "",
+  "outputDirectory": ".",
+  "framework": null,
+  "functions": {},
+  "routes": [
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=86400, s-maxage=604800"
+      }
+    }
+  ]
 }

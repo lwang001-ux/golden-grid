@@ -5,7 +5,9 @@
   "main": "index.html",
   "scripts": {
     "start": "npx serve .",
-    "dev": "npx serve . -l 3000"
+    "dev": "npx serve . -l 3000",
+    "deploy:vercel": "npx vercel",
+    "deploy:vercel:prod": "npx vercel --prod"
   },
   "keywords": [
     "generative-art",
